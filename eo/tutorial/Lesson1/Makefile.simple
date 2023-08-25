@@ -1,0 +1,35 @@
+# if you use this Makefile as a starting point for another application
+# you might need to modify the following
+DIR_EO = ../../../build/lib
+DIR_TEMP = ../../src
+
+.SUFFIXES: .cpp
+
+# Warning: $(CXX) in Linux (RedHat and Mandrake at least) is g++
+# However, if you are using this Makefile within xemacs,
+# and have problems with the interpretation of the output (and its colors)
+# then you should use c++ instead (make CXX=c++ will do)
+
+.cpp: ; $(CXX) -std=c++17 -DPACKAGE=\"eo\" -DVERSION=\"0.9.1\" -I. -I$(DIR_TEMP) -Wall -g -pg  -o $@  $*.cpp $(DIR_EO)/libeoutils.a $(DIR_EO)/libeo.a
+
+.cpp.o: ; $(CXX) -std=c++17 -DPACKAGE=\"eo\" -DVERSION=\"0.9.1\" -I. -I$(DIR_TEMP) -Wall -g -c -pg $*.cpp
+
+
+
+firstGA = FirstRealGA FirstBitGA
+
+ALL = $(firstGA) exercise1.3
+
+lesson1 : $(firstGA)
+
+all : $(ALL)
+
+clean :
+	@/bin/rm $(ALL) *.o *~
+	
+	
+	# c++ -std=c++17 -DPACKAGE=\"eo\" -DVERSION=\"0.9.1\" -I. -I../../src -Wall -g -c algoritmo_genetico.cpp
+
+
+	# c++ -std=c++17 -Wall -g -o algoritmo_genetico algoritmo_genetico.o ../../../build/lib/libeo.a ../../../build/lib/libeoutils.a
+
