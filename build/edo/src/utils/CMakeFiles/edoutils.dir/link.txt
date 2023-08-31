@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../../lib/libedoutils.a  CMakeFiles/edoutils.dir/edoFileSnapshot.cpp.o
-/usr/bin/ranlib ../../../lib/libedoutils.a

@@ -9,6 +9,21 @@
 #include <eoInit.h>
 #include <unordered_map>
 
+/*
+ * Partially Mapped Crossover
+ *   P1 = [4, 2, 0, 1, 3]
+ *   P2 = [1, 0, 3, 4, 2]
+ * Selecionar dois pontos de corte. Os valores de dentro
+ * serão trocados nos filhos.
+ *   C1 = [4, 2, 3, 4, 3]
+ * Faz-se o mapeamento dos valores dentro do intervalo
+ *   3 <-> 0, 4<->1
+ * Preservar aqueles que não fazem conflito fora do intervalo
+ *   C1 = [*, 2, 3, 4, *]
+ * Mapear o restante
+ *   C1 = [1, 2, 3, 4, 0]
+ */
+
 template <class Chrom>
 class eoPMXover : public eoQuadOp<Chrom>
 {
@@ -18,7 +33,7 @@ public:
     bool operator()(Chrom &_chrom1, Chrom &_chrom2)
     {
         unsigned cut1, cut2;
-        // generate two different indices
+
         cut1 = eo::rng.random(_chrom1.size());
         do
         {
@@ -29,25 +44,15 @@ public:
         Chrom tmp1 = _chrom1;
         Chrom tmp2 = _chrom2;
 
-        // for (int i = std::min(cut1, cut2); i <= std::max(cut1, cut2); ++i)
-        // {
-        //     child1[i] = parent2[i];
-        //     child2[i] = parent1[i];
-        // }
-
-        std::unordered_map<int, int> mapping;
-        for (int i = cut1; i <= cut2; ++i)
-        {
-            mapping[parent1[i]] = parent2[i];
-            mapping[parent2[i]] = parent1[i];
-        }
-
         // char direction = eo::rng.flip() ? 1 : -1;
         // unsigned cut2 = 1 + eo::rng.random(_chrom1.size());
         // unsigned cut1 = eo::rng.random(cut2);
 
-        cross(tmp1, tmp2, _chrom1, direction, cut1, cut2);
-        cross(tmp2, tmp1, _chrom2, direction, cut1, cut2);
+        cross(tmp1, tmp2, _chrom1, cut1, cut2);
+        cross(tmp2, tmp1, _chrom2, cut1, cut2);
+
+        _chrom1.invalidate();
+        _chrom2.invalidate();
 
         // _chrom1.invalidate();
         // _chrom2.invalidate();
@@ -56,32 +61,35 @@ public:
     }
 
 private:
-    void cross(Chrom &_chrom1, Chrom &_chrom2, Chrom &_child, char _direction, unsigned _cut1, unsigned _cut2)
+    void cross(Chrom &_chrom1, Chrom &_chrom2, Chrom &_child, unsigned _cut1, unsigned _cut2)
     {
-        
-        // unsigned size, id = 0, from = 0;
-        // size = _chrom1.size();
 
-        // std::vector<bool> verif(size, false);
+        unsigned size;
+        size = _chrom1.size();
 
-        // for (unsigned i = _cut1; i < _cut2; i++)
-        // {
-        //     _child[id++] = _chrom1[i];
-        //     verif[_chrom1[i] % size] = true;
-        // }
+        // * Sem ordenação torna o acesso mais rápido
+        std::unordered_map<int, int> mapping; // mapeia valor do pai1 ao pai2
+        for (unsigned i = std::min(_cut1, _cut2); i <= std::max(_cut1, _cut2); ++i)
+        {
+            mapping[_chrom1[i]] = _chrom2[i];
+            mapping[_chrom2[i]] = _chrom1[i];
+        }
 
-        // while (_chrom2[from] != _child[_cut2 - 1])
-        //     from++;
+        std::vector<bool> verif(size, false);
 
-        // for (unsigned i = 0; i < size; i++)
-        // {
-        //     unsigned j = (_direction * i + from + size) % size;
-        //     if (!verif[_chrom2[j] % size])
-        //     {
-        //         _child[id++] = _chrom2[j];
-        //         verif[_chrom2[j] % size] = true;
-        //     }
-        // }
+        for (unsigned i = std::min(_cut1, _cut2); i <= std::max(_cut1, _cut2); i++)
+        {
+            verif[_child[i]] = true;
+        }
+
+        for (unsigned i = 0; i < size; i++)
+        {
+            if (verif[_child[i]])
+            {
+                verif[mapping[_child[i]]] = true;
+                _child[i] = mapping[_child[i]];
+            }
+        }
     }
 };
 

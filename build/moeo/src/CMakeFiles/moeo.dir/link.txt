@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../lib/libmoeo.a  CMakeFiles/moeo.dir/core/moeoObjectiveVectorTraits.cpp.o
-/usr/bin/ranlib ../../lib/libmoeo.a

@@ -18,6 +18,7 @@
 #include <es.h>
 #include <eoInt.h>
 #include <eoOrderXover.h>
+#include <eoPMXover.h>
 #include <eoTwoOptMutation.h>
 
 using namespace std;
@@ -211,7 +212,7 @@ void main_function(int /*argc*/, char ** /*argv*/)
     eoDetTournamentSelect<Chrom> select(TOURNAMENT_SIZE);
 
     // CROSSOVER
-    eoOrderXover<Chrom> xover;
+    eoPMXover<Chrom> xover;
     // eoSegmentCrossover<Chrom> xover;
 
     // MUTATION
