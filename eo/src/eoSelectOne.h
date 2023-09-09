@@ -25,7 +25,6 @@
 #ifndef _eoSelectOne_h
 #define _eoSelectOne_h
 
-
 //-----------------------------------------------------------------------------
 #include "eoPop.h"
 #include "eoFunctor.h"
@@ -39,22 +38,21 @@
 
 @ingroup Selectors
 */
-#if  defined(_MSC_VER) && (_MSC_VER < 1300)
-template<class EOT, class WorthT = EOT::Fitness>
+#if defined(_MSC_VER) && (_MSC_VER < 1300)
+template <class EOT, class WorthT = EOT::Fitness>
 #else
-template<class EOT, class WorthT = typename EOT::Fitness>
+template <class EOT, class WorthT = typename EOT::Fitness>
 #endif
-class eoSelectOne : public eoUF<const eoPop<EOT>&, const EOT&>
+class eoSelectOne : public eoUF<const eoPop<EOT> &, const EOT &>
 {
-    public :
-      /// virtual function to setup some population stats (for instance eoProportional can benefit greatly from this)
-      virtual void setup(const eoPop<EOT>& _pop)
-      {
-          (void)_pop;
-      }
+public:
+  /// virtual function to setup some population stats (for instance eoProportional can benefit greatly from this)
+  virtual void setup(const eoPop<EOT> &_pop)
+  {
+    (void)_pop;
+  }
 };
 /** @example t-selectOne.cpp
  */
-
 
 #endif

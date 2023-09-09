@@ -25,7 +25,6 @@
 #ifndef _eoSelectPerc_h
 #define _eoSelectPerc_h
 
-
 //-----------------------------------------------------------------------------
 #include "eoSelect.h"
 #include "eoSelectOne.h"
@@ -40,21 +39,21 @@
 
 @ingroup Selectors
 */
-template<class EOT>
+template <class EOT>
 class eoSelectPerc : public eoSelect<EOT>
 {
- public:
-     /// init
-     eoSelectPerc(eoSelectOne<EOT>& _select, float _rate = 1.0)
-         : select(_select), rate(_rate) {}
+public:
+  /// init
+  eoSelectPerc(eoSelectOne<EOT> &_select, float _rate = 1.0)
+      : select(_select), rate(_rate) {}
 
-     /**
-     The implementation selects a percentage
+  /**
+  The implementation selects a percentage
 
-     @param _source the source population
-     @param _dest  the resulting population (size of this population is the number of times eoSelectOne is called. It empties the destination and adds the selection into it)
-     */
-  virtual void operator()(const eoPop<EOT>& _source, eoPop<EOT>& _dest)
+  @param _source the source population
+  @param _dest  the resulting population (size of this population is the number of times eoSelectOne is called. It empties the destination and adds the selection into it)
+  */
+  virtual void operator()(const eoPop<EOT> &_source, eoPop<EOT> &_dest)
   {
     size_t target = static_cast<size_t>(floor(rate * _source.size()));
 
@@ -66,8 +65,8 @@ class eoSelectPerc : public eoSelect<EOT>
       _dest[i] = select(_source);
   }
 
-private :
-  eoSelectOne<EOT>& select;
+private:
+  eoSelectOne<EOT> &select;
   float rate;
 };
 

@@ -1,5 +1,7 @@
-// #ifndef eoOrderXover_h
-// #define eoOrderXover_h
+// -*- mode: c++; c-indent-level: 4; c++-member-init-indent: 8; comment-column: 35; -*-
+//-----------------------------------------------------------------------------
+// eoPMXover.h
+//-----------------------------------------------------------------------------
 
 #ifndef eoPMXover_h
 #define eoPMXover_h
@@ -30,15 +32,18 @@ class eoPMXover : public eoQuadOp<Chrom>
 public:
     virtual std::string className() const { return "eoPMXover"; }
 
+    /**
+     * @return true if the chromosome has changed
+     * @param _chrom1 The first chromosome which will be crossed with chrom2.
+     * @param _chrom2 The second chromosome which will be crossed with chrom1.
+     */
     bool operator()(Chrom &_chrom1, Chrom &_chrom2)
     {
         unsigned cut1, cut2;
 
         cut1 = eo::rng.random(_chrom1.size());
-        do
-        {
-            cut2 = eo::rng.random(_chrom1.size());
-        } while (cut1 == cut2);
+        cut2 = eo::rng.random(_chrom1.size());
+
 
         // Cria copias dos pais. Assim os originais viram filhos
         Chrom tmp1 = _chrom1;
@@ -54,13 +59,17 @@ public:
         _chrom1.invalidate();
         _chrom2.invalidate();
 
-        // _chrom1.invalidate();
-        // _chrom2.invalidate();
-
         return true;
     }
 
 private:
+    /**
+     * @param _chrom1 The first parent chromosome.
+     * @param _chrom2 The second parent chromosome.
+     * @param _child The result chromosome.
+     * @param _cut1 index of the first cut
+     * @param _cut2 index of the second cut
+     */
     void cross(Chrom &_chrom1, Chrom &_chrom2, Chrom &_child, unsigned _cut1, unsigned _cut2)
     {
 
@@ -71,22 +80,23 @@ private:
         std::unordered_map<int, int> mapping; // mapeia valor do pai1 ao pai2
         for (unsigned i = std::min(_cut1, _cut2); i <= std::max(_cut1, _cut2); ++i)
         {
+            _child[i] = _chrom2[i];
             mapping[_chrom1[i]] = _chrom2[i];
             mapping[_chrom2[i]] = _chrom1[i];
         }
 
-        std::vector<bool> verif(size, false);
+        std::vector<bool> repeated(size, true);
 
-        for (unsigned i = std::min(_cut1, _cut2); i <= std::max(_cut1, _cut2); i++)
+        for (auto gene : _child)
         {
-            verif[_child[i]] = true;
+            repeated[gene] = !repeated[gene];
         }
 
         for (unsigned i = 0; i < size; i++)
         {
-            if (verif[_child[i]])
+            if (i < std::min(_cut1, _cut2) && i > std::max(_cut1, _cut2) && repeated[_child[i]])
             {
-                verif[mapping[_child[i]]] = true;
+                repeated[_child[i]] = false;
                 _child[i] = mapping[_child[i]];
             }
         }

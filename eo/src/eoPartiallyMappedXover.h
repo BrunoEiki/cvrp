@@ -40,8 +40,8 @@
  * for permutation representation
  *
  */
-template <class EOT> 
-class eoPartiallyMappedXover : public eoQuadOp<EOT> 
+template <class EOT>
+class eoPartiallyMappedXover : public eoQuadOp<EOT>
 {
 public:
   /**
@@ -50,77 +50,86 @@ public:
    * @param _solution2 The second solution
    * @return true if the solution has changed
    */
-  bool operator()(EOT & _solution1, EOT & _solution2) {
-    if (_solution1.size() > 1) {
+  bool operator()(EOT &_solution1, EOT &_solution2)
+  {
+    if (_solution1.size() > 1)
+    {
       // random indexes such that i1 < i2
       size_t i1 = rng.random(_solution1.size());
       size_t i2 = rng.random(_solution1.size());
 
       while (i1 == i2)
-	i2 = rng.random(_solution1.size());
-      
-      if (i1 > i2) {
-	size_t tmp = i1;
-	i1 = i2;
-	i2 = tmp;
-      }
-      
-      // the permutations between s1 and s2 
-      size_t * p1 = new size_t[_solution1.size()];
-      size_t * p2 = new size_t[_solution1.size()];
-      
-      size_t i;
-      for(i = 0; i < _solution1.size(); i++) {
-	p1[i] = -1;
-	p2[i] = -1;
+        i2 = rng.random(_solution1.size());
+
+      if (i1 > i2)
+      {
+        size_t tmp = i1;
+        i1 = i2;
+        i2 = tmp;
       }
 
-      for(i = i1; i <= i2; i++) {
-	p1[ _solution2[i] ] = _solution1[i] ;
-	p2[ _solution1[i] ] = _solution2[i] ;
+      // the permutations between s1 and s2
+      size_t *p1 = new size_t[_solution1.size()];
+      size_t *p2 = new size_t[_solution1.size()];
+
+      size_t i;
+      for (i = 0; i < _solution1.size(); i++)
+      {
+        p1[i] = -1;
+        p2[i] = -1;
+      }
+
+      for (i = i1; i <= i2; i++)
+      {
+        p1[_solution2[i]] = _solution1[i];
+        p2[_solution1[i]] = _solution2[i];
       }
 
       // replace if necessary
-      for(i = 0; i < i1; i++) {
-	while (p1[ _solution1[i] ] != -1) 
-	  _solution1[i] = p1[_solution1[i]];
-	while (p2[ _solution2[i] ] != -1) 
-	  _solution2[i] = p2[_solution2[i]];
-      }      
+      for (i = 0; i < i1; i++)
+      {
+        while (static_cast<int>(p1[_solution1[i]]) != -1)
+          _solution1[i] = p1[_solution1[i]];
+        while (static_cast<int>(p2[_solution2[i]]) != -1)
+          _solution2[i] = p2[_solution2[i]];
+      }
 
       // swap between solution1 and solution2 for [i1..i2]
-      for(i = i1; i <= i2; i++) {
-	_solution1[i] = p2[ _solution1[i] ];
-	_solution2[i] = p1[ _solution2[i] ];
+      for (i = i1; i <= i2; i++)
+      {
+        _solution1[i] = p2[_solution1[i]];
+        _solution2[i] = p1[_solution2[i]];
       }
 
       // replace if necessary
-      for(i = i2 + 1; i < _solution1.size(); i++) {
-	while (p1[ _solution1[i] ] != -1) 
-	  _solution1[i] = p1[_solution1[i]];
-	while (p2[ _solution2[i] ] != -1) 
-	  _solution2[i] = p2[_solution2[i]];
-      }      
+      for (i = i2 + 1; i < _solution1.size(); i++)
+      {
+        while (static_cast<int>(p1[_solution1[i]]) != -1)
+          _solution1[i] = p1[_solution1[i]];
+        while (static_cast<int>(p2[_solution2[i]]) != -1)
+          _solution2[i] = p2[_solution2[i]];
+      }
 
       // invalidate the solutions because they have been modified
       _solution1.invalidate();
       _solution2.invalidate();
 
-      delete [] p1;
-      delete [] p2;
+      delete[] p1;
+      delete[] p2;
 
       return true;
-    } else
+    }
+    else
       return false;
   }
 
   /**
    * The class name.
    */
-  virtual std::string className() const { 
-    return "eoPartiallyMappedXover"; 
+  virtual std::string className() const
+  {
+    return "eoPartiallyMappedXover";
   }
-
 };
 
 #endif

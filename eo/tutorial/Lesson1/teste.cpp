@@ -17,8 +17,12 @@
 #include <eo>
 #include <es.h>
 #include <eoInt.h>
+#include <eoSurviveAndDie.h>
 #include <eoOrderXover.h>
+#include <eoOrderXover2.h>
 #include <eoPMXover.h>
+#include <eoCycleXover.h>
+#include <eoPartiallyMappedXover.h>
 #include <eoTwoOptMutation.h>
 
 using namespace std;
@@ -30,7 +34,7 @@ static size_t WriteCallback(char *contents, size_t size, size_t nmemb, char *buf
 }
 
 // VARIAVEIS GLOBAIS
-std::ifstream file("./cvrp-0-to-99.json");
+std::ifstream file("./cvrp-0-to-99-dois.json");
 nlohmann::json jsonDados;
 
 std::pair<double, double> origem;                   // ponto de partida
@@ -90,11 +94,8 @@ double real_value(const Chrom &_chrom)
         while (true)
         {
             if ((i == pop_size) || (peso_atual + pesos[_chrom[i]] > 300))
-            {
-                // cout << "\nPeso da entrega" << _chrom[i] << ": " << pesos[_chrom[i]];
-                // cout << "\nPeso Limite: " << peso_atual << "\n";
                 break;
-            }
+
             peso_atual += pesos[_chrom[i]];
             s << coordenadas[_chrom[i]].first << "," << coordenadas[_chrom[i]].second << ";";
             i++;
@@ -168,8 +169,8 @@ void main_function(int /*argc*/, char ** /*argv*/)
     // ========================
     const unsigned int SEED = 42;
     const unsigned int IND_SIZE = pesos.size(); // Tamanho do indivíduo (solução)
-    const unsigned int POP_SIZE = 10;           // Tamanho da população
-    const unsigned int MAX_GEN = 50;
+    const unsigned int POP_SIZE = 4;            // Tamanho da população
+    const unsigned int MAX_GEN = 5;
     const unsigned int TOURNAMENT_SIZE = 2;
     // const double EPSILON = 0.01; // range for real uniform mutation
     const float CROSS_RATE = 0.8;
@@ -210,9 +211,11 @@ void main_function(int /*argc*/, char ** /*argv*/)
 
     // SELECTION
     eoDetTournamentSelect<Chrom> select(TOURNAMENT_SIZE);
+    // eoDeterministicSaDReplacement<Chrom> select(10, 10);
 
     // CROSSOVER
-    eoPMXover<Chrom> xover;
+    eoCycleXover<Chrom> xover;
+    // eoPartiallyMappedXover<Chrom> xover;
     // eoSegmentCrossover<Chrom> xover;
 
     // MUTATION
