@@ -21,7 +21,10 @@
 #include <eoOrderXover.h>
 #include <eoOrderXover2.h>
 #include <eoPMXover.h>
+#include <eoLinearOrderXover.h>
+#include <eoPMXover.h>
 #include <eoCycleXover.h>
+#include <eoPrecedencePreserveXover.h>
 #include <eoPartiallyMappedXover.h>
 #include <eoTwoOptMutation.h>
 
@@ -214,9 +217,11 @@ void main_function(int /*argc*/, char ** /*argv*/)
     // eoDeterministicSaDReplacement<Chrom> select(10, 10);
 
     // CROSSOVER
-    eoCycleXover<Chrom> xover;
+    // eoCycleXover<Chrom> xover;
     // eoPartiallyMappedXover<Chrom> xover;
-    // eoSegmentCrossover<Chrom> xover;
+    // eoPrecedencePreserveXover<Chrom> xover;
+    eoLinearOrderXover<Chrom> xover;
+    // eoOrderXover2<Chrom> xover;
 
     // MUTATION
     // eoUniformMutation<Chrom> mutation(EPSILON);

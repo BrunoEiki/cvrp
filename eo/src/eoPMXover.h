@@ -44,14 +44,19 @@ public:
         cut1 = eo::rng.random(_chrom1.size());
         cut2 = eo::rng.random(_chrom1.size());
 
+        do
+            cut2 = rng.random(_chrom1.size());
+        while (cut1 == cut2);
 
-        // Cria copias dos pais. Assim os originais viram filhos
+        if (cut1 > cut2)
+        {
+            size_t tmp = cut1;
+            cut1 = cut2;
+            cut2 = tmp;
+        }
+
         Chrom tmp1 = _chrom1;
         Chrom tmp2 = _chrom2;
-
-        // char direction = eo::rng.flip() ? 1 : -1;
-        // unsigned cut2 = 1 + eo::rng.random(_chrom1.size());
-        // unsigned cut1 = eo::rng.random(cut2);
 
         cross(tmp1, tmp2, _chrom1, cut1, cut2);
         cross(tmp2, tmp1, _chrom2, cut1, cut2);
@@ -78,7 +83,7 @@ private:
 
         // * Sem ordenação torna o acesso mais rápido
         std::unordered_map<int, int> mapping; // mapeia valor do pai1 ao pai2
-        for (unsigned i = std::min(_cut1, _cut2); i <= std::max(_cut1, _cut2); ++i)
+        for (unsigned i = _cut1; i <= _cut2; ++i)
         {
             _child[i] = _chrom2[i];
             mapping[_chrom1[i]] = _chrom2[i];
@@ -94,7 +99,7 @@ private:
 
         for (unsigned i = 0; i < size; i++)
         {
-            if (i < std::min(_cut1, _cut2) && i > std::max(_cut1, _cut2) && repeated[_child[i]])
+            if ((i < _cut1 || i > _cut2) && repeated[_child[i]])
             {
                 repeated[_child[i]] = false;
                 _child[i] = mapping[_child[i]];
