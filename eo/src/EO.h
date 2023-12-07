@@ -104,11 +104,19 @@ public:
    */
   bool invalid() const { return invalidFitness; }
 
+  // ! original
   /** Returns true if
       @return true if the fitness is higher
   */
   bool operator<(const EO& _eo2) const { return fitness() < _eo2.fitness(); }
   bool operator>(const EO& _eo2) const { return !(fitness() <= _eo2.fitness()); }
+
+  // ! alternative
+  /** Return true if
+      @return true if the fitness is lower
+  */
+  // bool operator<(const EO &_eo2) const { return fitness() <= _eo2.fitness(); }
+  // bool operator>(const EO &_eo2) const { return !(fitness() > _eo2.fitness()); }
 
   /// Methods inherited from eoObject
   //@{

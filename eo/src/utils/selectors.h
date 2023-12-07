@@ -278,7 +278,7 @@ It deterministic_tournament(It _begin, It _end, unsigned _t_size, eoRng& _gen = 
     {
         It competitor = _begin + _gen.random(_end - _begin);
 
-        if (*best < *competitor)
+        if (*best > *competitor)
         {
             best = competitor;
         }

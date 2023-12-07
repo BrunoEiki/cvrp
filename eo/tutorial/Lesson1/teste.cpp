@@ -37,7 +37,7 @@ static size_t WriteCallback(char *contents, size_t size, size_t nmemb, char *buf
 }
 
 // VARIAVEIS GLOBAIS
-std::ifstream file("./cvrp-0-to-99-dois.json");
+std::ifstream file("./cvrp-0-to-99.json");
 nlohmann::json jsonDados;
 
 std::pair<double, double> origem;                   // ponto de partida
@@ -70,16 +70,16 @@ void gerarVetorAleatorio(Chrom &_chrom, int n)
 // uma função fitness que calcula a distância total percorrida mantendo a restrição
 // de capacidade.
 //    @param _indi Um indivíduo de valores reais
-
 double real_value(const Chrom &_chrom)
 {
 
     std::string entregas;
-    double soma_distancia = 0.0;
+    int carga_max = 180;
 
     int i = 0;
     int peso_atual;
     int pop_size = pesos.size();
+	double soma_distancia = 0.0;
 
     while (i < pop_size)
     {
@@ -89,34 +89,36 @@ double real_value(const Chrom &_chrom)
         std::string readBuffer;
         std::string url;
 
-        std::stringstream s;
+        std::stringstream coordinate;
         std::stringstream requisicao;
 
         peso_atual = 0;
-        s << origem.first << "," << origem.second << ";";
+
+        // * Hub coordinate
+        coordinate << origem.first << "," << origem.second << ";";
         while (true)
         {
-            if ((i == pop_size) || (peso_atual + pesos[_chrom[i]] > 300))
+            if ((i == pop_size) || (peso_atual + pesos[_chrom[i]] > carga_max))
                 break;
 
             peso_atual += pesos[_chrom[i]];
-            s << coordenadas[_chrom[i]].first << "," << coordenadas[_chrom[i]].second << ";";
+            coordinate << coordenadas[_chrom[i]].first << "," << coordenadas[_chrom[i]].second << ";";
             i++;
         }
+        // Return back to hub
+        coordinate << origem.first << "," << origem.second;
 
         // ==========================================================
         // REQUISITAR CALCULO DE DISTANCIA NO SERVIDOR LOCAL DO OSRM
         // ==========================================================
-        entregas = s.str();
-        entregas.pop_back(); // retira o ultimo ponto e virgula da string
+        curl = curl_easy_init();
+       	entregas = coordinate.str();
         requisicao << "http://localhost:5000/route/v1/driving/" + entregas + "?annotations=distance&continue_straight=false";
         url = requisicao.str();
 
-        // cout << "\nURL: " << url;
-
-        curl = curl_easy_init();
         if (curl)
         {
+
             curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
@@ -125,20 +127,18 @@ double real_value(const Chrom &_chrom)
 
             if (res == CURLE_OK)
             {
-                // SOMAR AS DISTANCIAS DE CADA ROTA
+                // SOMAR AS DISTANCIAS DE CADA VEICULO
                 nlohmann::json jsonObject = nlohmann::json::parse(readBuffer);
                 // ! DOUBLE CHECK
-                soma_distancia += jsonObject["routes"][0]["legs"][0]["distance"].get<double>();
+                soma_distancia += jsonObject["routes"][0]["distance"].get<double>();
             }
             else
             {
                 std::cerr << "Erro ao realizar a solicitação HTTP: " << curl_easy_strerror(res) << std::endl;
             }
-
-            curl_easy_cleanup(curl);
+  	        curl_easy_cleanup(curl);
         }
     }
-    // cout << setprecision(2) << soma_distancia;
     return soma_distancia;
 }
 
@@ -151,6 +151,7 @@ void main_function(int /*argc*/, char ** /*argv*/)
     // =======================================
     file >> jsonDados;
 
+    // ! osrm requer primeiro "lng" depois "lat".
     lng = jsonDados["origin"]["lng"].get<double>();
     lat = jsonDados["origin"]["lat"].get<double>();
     origem = {lng, lat};
@@ -172,8 +173,8 @@ void main_function(int /*argc*/, char ** /*argv*/)
     // ========================
     const unsigned int SEED = 42;
     const unsigned int IND_SIZE = pesos.size(); // Tamanho do indivíduo (solução)
-    const unsigned int POP_SIZE = 4;            // Tamanho da população
-    const unsigned int MAX_GEN = 5;
+    const unsigned int POP_SIZE = 80;           // Tamanho da população
+    const unsigned int MAX_GEN = 100;
     const unsigned int TOURNAMENT_SIZE = 2;
     // const double EPSILON = 0.01; // range for real uniform mutation
     const float CROSS_RATE = 0.8;
@@ -195,7 +196,7 @@ void main_function(int /*argc*/, char ** /*argv*/)
     // Individuo: vetor solução com a ordem das entregas
 
     eoPop<Chrom> pop;
-    std::cout << "\nTamanho do Individuo: " << IND_SIZE;
+    // std::cout << "\nTamanho do Individuo: " << IND_SIZE;
     // fill it!
     for (unsigned int igeno = 0; igeno < POP_SIZE; igeno++)
     {
@@ -206,22 +207,23 @@ void main_function(int /*argc*/, char ** /*argv*/)
         pop.push_back(v); // and put it in the population
     }
 
-    pop.sort();
-    cout << "\n\nCONFIGURAÇAO INICIAL";
-    cout << "\n===========================";
-    cout << "\nDistTot  Tam   Indices";
-    cout << "\n=========================== pop: " << pop;
+    // pop.sort();
+    // cout << "\n\nCONFIGURAÇAO INICIAL";
+    // cout << "\n===========================";
+    // cout << "\nDistTot  Tam   Indices";
+    // cout << "\n=========================== pop: " << pop;
 
     // SELECTION
     eoDetTournamentSelect<Chrom> select(TOURNAMENT_SIZE);
     // eoDeterministicSaDReplacement<Chrom> select(10, 10);
 
     // CROSSOVER
-    // eoCycleXover<Chrom> xover;
-    // eoPartiallyMappedXover<Chrom> xover;
-    // eoPrecedencePreserveXover<Chrom> xover;
-    eoLinearOrderXover<Chrom> xover;
-    // eoOrderXover2<Chrom> xover;
+    // eoCycleXover<Chrom> xover; // converge mto rapido
+    // eoPartiallyMappedXover<Chrom> xover;   //converge mt rapido
+    eoPrecedencePreserveXover<Chrom> xover;  //converge mto rapido
+    // eoLinearOrderXover<Chrom> xover; // errado
+    // eoOrderXover2<Chrom> xover; //converge mto rapido
+    // eoOrderXover<Chrom> xover; // menos pior
 
     // MUTATION
     // eoUniformMutation<Chrom> mutation(EPSILON);
@@ -237,11 +239,11 @@ void main_function(int /*argc*/, char ** /*argv*/)
 
     gga(pop);
 
-    pop.sort();
-    cout << "\n\nCONFIGURAÇAO FINAL";
-    cout << "\n===========================";
-    cout << "\nDistTot  Tam   Indices";
-    cout << "\n=========================== pop: " << pop;
+    // pop.sort();
+    // cout << "\n\nCONFIGURAÇAO FINAL";
+    // cout << "\n===========================";
+    // cout << "\nDistTot  Tam   Indices";
+    // cout << "\n=========================== pop: " << pop;
 }
 
 int main(int argc, char **argv)

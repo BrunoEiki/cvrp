@@ -33,12 +33,13 @@ public:
          */
         bool operator()(Chrom &_chrom1, Chrom &_chrom2)
         {
-
                 Chrom tmp1 = _chrom1;
                 Chrom tmp2 = _chrom2;
 
-                cross(tmp1, tmp2, _chrom2);
-                cross(tmp2, tmp1, _chrom1);
+                int cycle_index = eo::rng.random(_chrom1.size());
+
+                cross(tmp1, tmp2, _chrom2, cycle_index);
+                cross(tmp2, tmp1, _chrom1, cycle_index);
 
                 _chrom1.invalidate();
                 _chrom2.invalidate();
@@ -55,33 +56,20 @@ private:
          * @param _cut1 index of the first cut
          * @param _cut2 index of the second cut
          */
-        void cross(Chrom &_chrom1, Chrom &_chrom2, Chrom &_child)
+        void cross(Chrom &_chrom1, Chrom &_chrom2, Chrom &_child, int cycle_index)
         {
-                unsigned size;
-                size = _chrom1.size();
+                int current = _chrom1[cycle_index];
 
-                bool direction = true;
-                int curr = _chrom1[0];
                 std::set<int> seen;
 
-                while (seen.count(curr) == 0)
+                while (seen.count(current) == 0)
                 {
-                        _child[curr] = curr;
-                        seen.insert(curr);
-                        direction = !direction;
+                        _child[cycle_index] = current;
+                        seen.insert(current);
+                        current = _chrom2[cycle_index];
 
-                        if (direction)
-                                curr = _chrom1[curr];
-                        else
-                                curr = _chrom2[curr];
-                }
-
-                for (unsigned i = 0; i < size; i++)
-                {
-                        if (seen.count(_chrom2[i]) == 0)
-                        {
-                                _child[i] = _chrom2[i];
-                        }
+                        auto a = find(_chrom1.begin(), _chrom1.end(), current);
+                        cycle_index = a - _chrom1.begin();
                 }
                 seen.clear();
         }

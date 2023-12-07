@@ -28,7 +28,6 @@ Old contact: todos@geneura.ugr.es, http://geneura.ugr.es
 #include "EO.h"
 #include "utils/eoLogger.h"
 
-
 /**
  @defgroup Representations Representations
 
@@ -53,7 +52,6 @@ template <class FitT, class GeneType>
 class eoVector : public EO<FitT>, public std::vector<GeneType>
 {
 public:
-
     using EO<FitT>::invalidate;
     using std::vector<GeneType>::operator[];
     using std::vector<GeneType>::begin;
@@ -61,8 +59,8 @@ public:
     using std::vector<GeneType>::resize;
     using std::vector<GeneType>::size;
 
-    typedef GeneType                AtomType;
-    typedef std::vector<GeneType>   ContainerType;
+    typedef GeneType AtomType;
+    typedef std::vector<GeneType> ContainerType;
 
     /** default constructor
 
@@ -71,69 +69,72 @@ public:
     */
     eoVector(unsigned _size = 0, GeneType _value = GeneType())
         : EO<FitT>(), std::vector<GeneType>(_size, _value)
-        {}
+    {
+    }
 
     /** Constructor copying from a vector (or an initialization list).
      */
-    eoVector( std::vector<GeneType> vec )
+    eoVector(std::vector<GeneType> vec)
         : EO<FitT>(), std::vector<GeneType>(vec)
-        {}
+    {
+    }
 
     /// copy ctor abstracting from the FitT
     template <class OtherFitnessType>
-    eoVector(const eoVector<OtherFitnessType, GeneType>& _vec) : std::vector<GeneType>(_vec)
-        {}
+    eoVector(const eoVector<OtherFitnessType, GeneType> &_vec) : std::vector<GeneType>(_vec)
+    {
+    }
 
     // we can't have a Ctor from a std::vector, it would create ambiguity
     //  with the copy Ctor
-    void value(const std::vector<GeneType>& _v)
+    void value(const std::vector<GeneType> &_v)
+    {
+        if (_v.size() != size()) // safety check
         {
-            if (_v.size() != size())       // safety check
-            {
-                if (size())                // NOT an initial empty std::vector
-                    eo::log << eo::warnings << "Warning: Changing size in eoVector assignation" << std::endl;
-                resize(_v.size());
-            }
-
-            std::copy(_v.begin(), _v.end(), begin());
-            invalidate();
+            if (size()) // NOT an initial empty std::vector
+                eo::log << eo::warnings << "Warning: Changing size in eoVector assignation" << std::endl;
+            resize(_v.size());
         }
+
+        std::copy(_v.begin(), _v.end(), begin());
+        invalidate();
+    }
 
     /// to avoid conflicts between EO::operator< and std::vector<GeneType>::operator<
-    bool operator<(const eoVector<FitT, GeneType>& _eo) const
-        {
-            return EO<FitT>::operator<(_eo);
-        }
+    bool operator<(const eoVector<FitT, GeneType> &_eo) const
+    {
+        return EO<FitT>::operator<(_eo);
+    }
 
     /// printing...
-    virtual void printOn(std::ostream& os) const
-        {
-            EO<FitT>::printOn(os);
-            os << ' ';
+    virtual void printOn(std::ostream &os) const
+    {
+        EO<FitT>::printOn(os);
+        os << ' ';
 
-            os << size() << ' ';
+        os << size() << ' ';
 
-            std::copy(begin(), end(), std::ostream_iterator<AtomType>(os, " "));
-        }
+        std::copy(begin(), end(), std::ostream_iterator<AtomType>(os, " "));
+    }
 
     /// reading...
-    virtual void readFrom(std::istream& is)
+    virtual void readFrom(std::istream &is)
+    {
+        EO<FitT>::readFrom(is);
+
+        unsigned sz;
+        is >> sz;
+
+        resize(sz);
+        unsigned i;
+
+        for (i = 0; i < sz; ++i)
         {
-            EO<FitT>::readFrom(is);
-
-            unsigned sz;
-            is >> sz;
-
-            resize(sz);
-            unsigned i;
-
-            for (i = 0; i < sz; ++i)
-            {
-                AtomType atom;
-                is >> atom;
-                operator[](i) = atom;
-            }
+            AtomType atom;
+            is >> atom;
+            operator[](i) = atom;
         }
+    }
 };
 /** @example t-eoVector.cpp
  */
@@ -144,11 +145,10 @@ This is impemented to avoid conflicts between EO::operator< and
 std::vector<GeneType>::operator<
 */
 template <class FitT, class GeneType>
-bool operator<(const eoVector<FitT, GeneType>& _eo1, const eoVector<FitT, GeneType>& _eo2)
+bool operator<(const eoVector<FitT, GeneType> &_eo1, const eoVector<FitT, GeneType> &_eo2)
 {
     return _eo1.operator<(_eo2);
 }
-
 
 /** Greater than
 
@@ -156,11 +156,10 @@ This is impemented to avoid conflicts between EO::operator> and
 std::vector<GeneType>::operator>
 */
 template <class FitT, class GeneType>
-bool operator>(const eoVector<FitT, GeneType>& _eo1, const eoVector<FitT, GeneType>& _eo2)
+bool operator>(const eoVector<FitT, GeneType> &_eo1, const eoVector<FitT, GeneType> &_eo2)
 {
     return _eo1.operator>(_eo2);
 }
-
 
 #endif
 

@@ -6,7 +6,6 @@ CMakeScripts
 Testing
 Makefile
 cmake_install.cmake
-*.txt
 compile_commands.json
 CTestTestfile.cmake
 deps

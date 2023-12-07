@@ -203,6 +203,7 @@ public:
           // this crossover generates 2 offspring from two parents
           if (cross(offspring[2 * i], offspring[2 * i + 1]))
           {
+            // invalidates parents
             offspring[2 * i].invalidate();
             offspring[2 * i + 1].invalidate();
           }
@@ -221,7 +222,15 @@ public:
       _pop.swap(offspring);
       apply<EOT>(eval, _pop);
 
+      std::stringstream bestof_generation;
+      _pop.sort();
+      bestof_generation << std::fixed << _pop.back();
+      // ! get only the total distance
+      // ! Slice 6:17 to get only the value and make sum easier
+      std::cout << bestof_generation.str().substr(0, 10) << ",";
+      std::stringstream().swap(bestof_generation);
     } while (cont(_pop));
+    std::cout << "\n";
   }
 
 private:
