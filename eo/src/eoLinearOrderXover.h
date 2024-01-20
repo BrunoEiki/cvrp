@@ -10,6 +10,7 @@
 #include <utils/eoRNG.h>
 #include <eoInit.h>
 #include <unordered_map>
+#include <bits/stdc++.h>
 
 /*
 In the basis of
@@ -30,7 +31,8 @@ public:
      */
     bool operator()(Chrom &_chrom1, Chrom &_chrom2)
     {
-        unsigned _cut1, _cut2;
+        unsigned _cut1;
+        unsigned _cut2;
 
         _cut1 = eo::rng.random(_chrom1.size());
         _cut2 = eo::rng.random(_chrom1.size());
@@ -41,7 +43,7 @@ public:
 
         if (_cut1 > _cut2)
         {
-            size_t tmp = _cut1;
+            unsigned tmp = _cut1;
             _cut1 = _cut2;
             _cut2 = tmp;
         }
@@ -49,7 +51,8 @@ public:
         Chrom tmp1 = _chrom1;
         Chrom tmp2 = _chrom2;
 
-        cross(tmp1, tmp2, _chrom1, _chrom2, _cut1, _cut2);
+        cross(tmp1, tmp2, _chrom1, _cut1, _cut2);
+        cross(tmp2, tmp1, _chrom2, _cut1, _cut2);
 
         _chrom1.invalidate();
         _chrom2.invalidate();
@@ -65,44 +68,38 @@ private:
      * @param _cut1 index of the first cut
      * @param _cut2 index of the second cut
      */
-    void cross(Chrom &_parent1, Chrom &_parent2, Chrom &_child1, Chrom &_child2, unsigned _cut1, unsigned _cut2)
+    void cross(Chrom &_chrom1, Chrom &_chrom2, Chrom &_child, unsigned _cut1, unsigned _cut2)
     {
-
-        unsigned size = _parent1.size();
-
-        _child1.resize(size, -1);
-        _child2.resize(size, -1);
+        std::set<int> setSegment; // set of elements in the crossover segment
+        unsigned size = _chrom1.size();
+        unsigned j = 0;
 
         for (unsigned i = _cut1; i <= _cut2; ++i)
         {
-            _child1[i] = _parent2[i];
-            _child2[i] = _parent1[i];
+            _child[i] = _chrom2[i];
+            setSegment.insert(_child[i]);
         }
 
         for (unsigned i = 0; i < size; ++i)
         {
-            if (i < _cut1 || i > _cut2)
+            if (setSegment.find(_chrom1[i]) == setSegment.end()) // if not in the set
             {
-                unsigned val1 = _parent1[i];
-                unsigned val2 = _parent2[i];
-
-                unsigned count1 = 0;
-                unsigned count2 = 0;
-
-                while (std::find(_child1.begin(), _child1.end(), val1) != _child1.end())
+                _child[j] = _chrom1[i];
+                j += 1;
+            }
+            if (j == _cut1)
+            {
+                if (j < size - 1)
                 {
-                    val1 = _parent1[count1++];
+                    j = _cut2 + 1;
                 }
-
-                while (std::find(_child2.begin(), _child2.end(), val2) != _child2.end())
+                else
                 {
-                    val2 = _parent2[count2++];
+                    break;
                 }
-
-                _child1[i] = val1;
-                _child2[i] = val2;
             }
         }
+        setSegment.clear();
     }
 };
 

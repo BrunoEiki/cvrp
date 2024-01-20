@@ -32,7 +32,7 @@ using namespace std;
 
 static size_t WriteCallback(char *contents, size_t size, size_t nmemb, char *buffer_in)
 {
-    ((std::string *)buffer_in)->append((char *)contents, size * nmemb);
+    ((std::string *)buffer_in)->append(contents, size * nmemb);
     return size * nmemb;
 }
 
@@ -79,7 +79,7 @@ double real_value(const Chrom &_chrom)
     int i = 0;
     int peso_atual;
     int pop_size = pesos.size();
-	double soma_distancia = 0.0;
+    double soma_distancia = 0.0;
 
     while (i < pop_size)
     {
@@ -112,7 +112,7 @@ double real_value(const Chrom &_chrom)
         // REQUISITAR CALCULO DE DISTANCIA NO SERVIDOR LOCAL DO OSRM
         // ==========================================================
         curl = curl_easy_init();
-       	entregas = coordinate.str();
+        entregas = coordinate.str();
         requisicao << "http://localhost:5000/route/v1/driving/" + entregas + "?annotations=distance&continue_straight=false";
         url = requisicao.str();
 
@@ -136,7 +136,7 @@ double real_value(const Chrom &_chrom)
             {
                 std::cerr << "Erro ao realizar a solicitação HTTP: " << curl_easy_strerror(res) << std::endl;
             }
-  	        curl_easy_cleanup(curl);
+            curl_easy_cleanup(curl);
         }
     }
     return soma_distancia;
@@ -149,7 +149,14 @@ void main_function(int /*argc*/, char ** /*argv*/)
     // =======================================
     // IMPORTAR AS COORDENADAS DAS ENTREGAS
     // =======================================
-    file >> jsonDados;
+    try
+    {
+        file >> jsonDados;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Erro durante a leitura do arquivo JSON: " << e.what() << std::endl;
+    }
 
     // ! osrm requer primeiro "lng" depois "lat".
     lng = jsonDados["origin"]["lng"].get<double>();
@@ -172,9 +179,9 @@ void main_function(int /*argc*/, char ** /*argv*/)
     //       PARAMETROS
     // ========================
     const unsigned int SEED = 42;
-    const unsigned int IND_SIZE = pesos.size(); // Tamanho do indivíduo (solução)
-    const unsigned int POP_SIZE = 80;           // Tamanho da população
-    const unsigned int MAX_GEN = 100;
+    const unsigned int IND_SIZE = pesos.size(); // Tamanho do indivíduo (solução).
+    const unsigned int POP_SIZE = 80;           // Tamanho da população. Padrão = 80.
+    const unsigned int MAX_GEN = 100;           // Número de gerações. Padrão 100.
     const unsigned int TOURNAMENT_SIZE = 2;
     // const double EPSILON = 0.01; // range for real uniform mutation
     const float CROSS_RATE = 0.8;
@@ -220,10 +227,10 @@ void main_function(int /*argc*/, char ** /*argv*/)
     // CROSSOVER
     // eoCycleXover<Chrom> xover; // converge mto rapido
     // eoPartiallyMappedXover<Chrom> xover;   //converge mt rapido
-    eoPrecedencePreserveXover<Chrom> xover;  //converge mto rapido
-    // eoLinearOrderXover<Chrom> xover; // errado
+    // eoPrecedencePreserveXover<Chrom> xover;  //converge mto rapido
+    eoLinearOrderXover<Chrom> xover; // errado
     // eoOrderXover2<Chrom> xover; //converge mto rapido
-    // eoOrderXover<Chrom> xover; // menos pior
+    // eoOrderXover<Chrom> xover;
 
     // MUTATION
     // eoUniformMutation<Chrom> mutation(EPSILON);

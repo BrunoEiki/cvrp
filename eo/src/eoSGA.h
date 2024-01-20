@@ -190,6 +190,14 @@ public:
   {
     eoPop<EOT> offspring;
 
+    // cross.className()
+    std::ofstream out("/home/bruno/cvrp/eo/tutorial/Lesson1/linearorder.txt", std::ios::out | std::ios::app);
+
+    if (!out)
+    {
+      std::cerr << "Erro ao abrir o arquivo.\n";
+    }
+    out << "\n";
     do
     {
       select(_pop, offspring);
@@ -224,13 +232,18 @@ public:
 
       std::stringstream bestof_generation;
       _pop.sort();
+
       bestof_generation << std::fixed << _pop.back();
+
       // ! get only the total distance
       // ! Slice 6:17 to get only the value and make sum easier
-      std::cout << bestof_generation.str().substr(0, 10) << ",";
+      out << bestof_generation.str().substr(0, 10) << ",";
+
       std::stringstream().swap(bestof_generation);
+
     } while (cont(_pop));
-    std::cout << "\n";
+
+    out.close();
   }
 
 private:
