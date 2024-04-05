@@ -27,9 +27,9 @@
 
 //-----------------------------------------------------------------------------
 
-#include <stdexcept>       // std::runtime_error
-#include "eoObject.h"      // eoObject
-#include "eoPersistent.h"  // eoPersistent
+#include <stdexcept>      // std::runtime_error
+#include "eoObject.h"     // eoObject
+#include "eoPersistent.h" // eoPersistent
 #include "eoExceptions.h"
 
 /**
@@ -59,41 +59,48 @@
 
     @example t-eo.cpp
 */
-template<class F = double> class EO: public eoObject, public eoPersistent
+template <class F = double>
+class EO : public eoObject, public eoPersistent
 {
 public:
   typedef F Fitness;
 
   /** Default constructor.
-  */
-  EO(): repFitness(Fitness()), invalidFitness(true) { }
+   */
+  EO() : repFitness(Fitness()), invalidFitness(true) {}
 
   /// Virtual dtor
-  virtual ~EO() {};
+  virtual ~EO(){};
 
   /// Return fitness value.
   // virtual const Fitness& fitness() const { // This would be impossible with MOEO.
   // virtual Fitness fitness() const { // Cannot do that either, MOEO changes the interface.
-  Fitness fitness() const {
+  Fitness fitness() const
+  {
     if (invalid())
-        throw eoInvalidFitnessError("Cannot retrieve unevaluated fitness");
+      throw eoInvalidFitnessError("Cannot retrieve unevaluated fitness");
     return repFitness;
   }
 
   /// Get fitness as reference, useful when fitness is set in a multi-stage way, e.g., MOFitness gets performance information, is subsequently ranked
-  Fitness& fitnessReference() {
+  Fitness &fitnessReference()
+  {
     if (invalid())
-        throw eoInvalidFitnessError("Cannot retrieve unevaluated fitness reference");
+      throw eoInvalidFitnessError("Cannot retrieve unevaluated fitness reference");
     return repFitness;
   }
 
   // Set fitness as invalid.
-  virtual void invalidate() { invalidFitness = true; repFitness = Fitness(); }
+  virtual void invalidate()
+  {
+    invalidFitness = true;
+    repFitness = Fitness();
+  }
 
   /** Set fitness. At the same time, validates it.
    *  @param _fitness New fitness value.
    */
-  void fitness(const Fitness& _fitness)
+  void fitness(const Fitness &_fitness)
   {
     repFitness = _fitness;
     invalidFitness = false;
@@ -108,8 +115,8 @@ public:
   /** Returns true if
       @return true if the fitness is higher
   */
-  bool operator<(const EO& _eo2) const { return fitness() < _eo2.fitness(); }
-  bool operator>(const EO& _eo2) const { return !(fitness() <= _eo2.fitness()); }
+  bool operator<(const EO &_eo2) const { return fitness() < _eo2.fitness(); }
+  bool operator>(const EO &_eo2) const { return !(fitness() <= _eo2.fitness()); }
 
   // ! alternative
   /** Return true if
@@ -134,51 +141,51 @@ public:
    * @param _is a std::istream.
    * @throw eoInvalidFitnessError If a valid object can't be read.
    */
-  virtual void readFrom(std::istream& _is) {
+  virtual void readFrom(std::istream &_is)
+  {
 
-        // the new version of the reafFrom function.
-        // It can distinguish between valid and invalid fitness values.
-        std::string fitness_str;
-        int pos = _is.tellg();
-        _is >> fitness_str;
+    // the new version of the reafFrom function.
+    // It can distinguish between valid and invalid fitness values.
+    std::string fitness_str;
+    int pos = _is.tellg();
+    _is >> fitness_str;
 
-        if (fitness_str == "INVALID")
-        {
-                invalidFitness = true;
-        }
-        else
-        {
-                invalidFitness = false;
-                _is.seekg(pos); // rewind
-                _is >> repFitness;
-        }
+    if (fitness_str == "INVALID")
+    {
+      invalidFitness = true;
+    }
+    else
+    {
+      invalidFitness = false;
+      _is.seekg(pos); // rewind
+      _is >> repFitness;
+    }
   }
 
   /**
    * Write object. Called printOn since it prints the object _on_ a stream.
    * @param _os A std::ostream.
    */
-  virtual void printOn(std::ostream& _os) const {
-
+  virtual void printOn(std::ostream &_os) const
+  {
 
     // the latest version of the code. Very similar to the old code
-    if (invalid()) {
-        _os << "INVALID ";
+    if (invalid())
+    {
+      _os << "INVALID ";
     }
     else
     {
-        _os << repFitness << ' ';
+      _os << repFitness << ' ';
     }
-
   }
 
   //@}
 
 private:
-  Fitness repFitness;   // value of fitness for this chromosome
-  bool invalidFitness;  // true if the value of fitness is invalid
+  Fitness repFitness;  // value of fitness for this chromosome
+  bool invalidFitness; // true if the value of fitness is invalid
 };
-
 
 #endif
 

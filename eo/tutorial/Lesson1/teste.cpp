@@ -44,6 +44,9 @@ std::pair<double, double> origem;                   // ponto de partida
 std::vector<std::pair<double, double>> coordenadas; // pontos de entregas
 std::vector<int> pesos;                             // peso de cada entrega
 
+CURLcode res;
+std::string readBuffer;
+
 double lng, lat;
 
 // REPRESENTATION
@@ -72,21 +75,40 @@ void gerarVetorAleatorio(Chrom &_chrom, int n)
 //    @param _indi Um indivíduo de valores reais
 double real_value(const Chrom &_chrom)
 {
-
     std::string entregas;
     int carga_max = 180;
 
-    int i = 0;
     int peso_atual;
-    int pop_size = pesos.size();
+    int individual_size = pesos.size();
     double soma_distancia = 0.0;
+    
+    CURL *curl;
 
+    std::string url;
+    soma_distancia = matrix_distance_calculator();
+    // url = osrm_build_request(peso_atual, individual_size, curl);
+    // soma_distancia = osrm_distance_calculator(curl);
+
+    return soma_distancia;
+}
+
+double matrix_distance_calculator()
+{
+    
+    euclidian_distance();
+}
+
+double euclidian_distance(float x1_point, float y1_point, float x2_point, float y2_point)
+{
+    return sqrt((y2_point - y1_point)**2 + (x2_point - y2_point)**2);
+}
+
+std::string osrm_build_request(int peso_atual, int pop_size, Curl *curl)
+{
+    int i = 0;
     while (i < pop_size)
     {
         // VARIAVEIS PARA REQUISIÇÃO
-        CURL *curl;
-        CURLcode res;
-        std::string readBuffer;
         std::string url;
 
         std::stringstream coordinate;
@@ -108,38 +130,42 @@ double real_value(const Chrom &_chrom)
         // Return back to hub
         coordinate << origem.first << "," << origem.second;
 
-        // ==========================================================
-        // REQUISITAR CALCULO DE DISTANCIA NO SERVIDOR LOCAL DO OSRM
-        // ==========================================================
+        //! TALVEZ DE ERRO AQUI
         curl = curl_easy_init();
         entregas = coordinate.str();
         requisicao << "http://localhost:5000/route/v1/driving/" + entregas + "?annotations=distance&continue_straight=false";
         url = requisicao.str();
-
-        if (curl)
-        {
-
-            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-
-            res = curl_easy_perform(curl);
-
-            if (res == CURLE_OK)
-            {
-                // SOMAR AS DISTANCIAS DE CADA VEICULO
-                nlohmann::json jsonObject = nlohmann::json::parse(readBuffer);
-                // ! DOUBLE CHECK
-                soma_distancia += jsonObject["routes"][0]["distance"].get<double>();
-            }
-            else
-            {
-                std::cerr << "Erro ao realizar a solicitação HTTP: " << curl_easy_strerror(res) << std::endl;
-            }
-            curl_easy_cleanup(curl);
-        }
     }
-    return soma_distancia;
+    return url
+}
+
+void osrm_distance_calculator(Curl *curl) 
+{
+    // ==========================================================
+    // REQUISITAR CALCULO DE DISTANCIA NO SERVIDOR LOCAL DO OSRM
+    // ==========================================================
+    if (curl)
+    {
+
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+
+        res = curl_easy_perform(curl);
+
+        if (res == CURLE_OK)
+        {
+            // SOMAR AS DISTANCIAS DE CADA VEICULO
+            nlohmann::json jsonObject = nlohmann::json::parse(readBuffer);
+            // ! DOUBLE CHECK
+            soma_distancia += jsonObject["routes"][0]["distance"].get<double>();
+        }
+        else
+        {
+            std::cerr << "Erro ao realizar a solicitação HTTP: " << curl_easy_strerror(res) << std::endl;
+        }
+        curl_easy_cleanup(curl);
+    }
 }
 
 void main_function(int /*argc*/, char ** /*argv*/)
@@ -266,4 +292,4 @@ int main(int argc, char **argv)
     return 1;
 }
 
-// (25773, 200000 + 33986, 800000 + 31799, 400000 + 31799, 400000 + 28334, 400000) / 5
+

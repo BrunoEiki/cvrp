@@ -191,13 +191,13 @@ public:
     eoPop<EOT> offspring;
 
     // cross.className()
-    std::ofstream out("/home/bruno/cvrp/eo/tutorial/Lesson1/linearorder.txt", std::ios::out | std::ios::app);
+    std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/nome.txt", std::ios::out | std::ios::app);
 
     if (!out)
     {
       std::cerr << "Erro ao abrir o arquivo.\n";
     }
-    out << "\n";
+    out << "===================\n";
     do
     {
       select(_pop, offspring);
@@ -237,7 +237,8 @@ public:
 
       // ! get only the total distance
       // ! Slice 6:17 to get only the value and make sum easier
-      out << bestof_generation.str().substr(0, 10) << ",";
+      // out << bestof_generation.str().substr(0, 10) << ",";
+      out << bestof_generation.str() << "\n";
 
       std::stringstream().swap(bestof_generation);
 
