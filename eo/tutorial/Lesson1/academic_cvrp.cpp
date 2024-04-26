@@ -10,6 +10,8 @@
 #include <fstream>
 #include <cmath>
 #include <algorithm>
+#include <numeric>
+
 
 #include <nlohmann/json.hpp>
 
@@ -118,20 +120,21 @@ double real_value(const Chrom &_chrom)
     int j = 1;
     int veiculo = 0;
     distancia_veiculo = (*matrix)[num_deliveries][_chrom[i]];
+    int sum_of_elems = std::accumulate(pesos.begin(), pesos.end(), 0);
+    
+    // std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/customers.txt", std::ios::out | std::ios::app);
 
     while (j < num_deliveries)
     {
-        if (peso_atual + pesos[_chrom[j]] > carga_max)
+        if ((peso_atual + pesos[_chrom[j]] > carga_max))
         {
             peso_total += peso_atual;
-            total_distancia_veiculos += distancia_veiculo;
+            total_distancia_veiculos += distancia_veiculo + (*matrix)[num_deliveries][_chrom[i]]; // last customer to origin point
 
             // reset variables
             peso_atual = pesos[_chrom[j]];
             distancia_veiculo = (*matrix)[num_deliveries][_chrom[j]];
             veiculo++;
-            std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/nome.txt", std::ios::out | std::ios::app);
-            out << "Veiculo " << veiculo << "\n";
         }
         else
         {
@@ -141,20 +144,27 @@ double real_value(const Chrom &_chrom)
         i++;
         j++;
     }
-
+    
+    if (peso_total != sum_of_elems)
+    {
+        peso_total += peso_atual;
+        total_distancia_veiculos += distancia_veiculo +  (*matrix)[num_deliveries][_chrom[i]];
+    }
     return total_distancia_veiculos;
 }
 
-void main_function(int argc, char *argv[])
+void main_function(int argc, std::string instance_name)
 {
     /*
      * argv[1]: json file name
      */
     std::cout << fixed;
 
-    std::cout << argv[1];
+    // std::string instance_name = argv[1];
 
-    std::ifstream f("/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Vrp-Set-A/A/A-n32-k5.vrp.json");
+    // std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Vrp-Set-A/A/" + instance_name;
+    std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Arnold/" + instance_name;
+    std::ifstream f(fullPath);
     auto jsonDados = nlohmann::json::parse(f);
 
     capacity = jsonDados["capacity"];
@@ -178,8 +188,8 @@ void main_function(int argc, char *argv[])
     // ========================
     const unsigned int SEED = 42;
     const unsigned int IND_SIZE = dimension; // Tamanho do indivíduo (solução).
-    const unsigned int POP_SIZE = 80;        // Tamanho da população. Padrão = 80.
-    const unsigned int MAX_GEN = 100;        // Número de gerações. Padrão 100.
+    const unsigned int POP_SIZE = 200;        // Tamanho da população. Padrão = 80.
+    const unsigned int MAX_GEN = 1000;        // Número de gerações. Padrão 100.
     const unsigned int TOURNAMENT_SIZE = 2;
     const float CROSS_RATE = 0.8;
     const float MUTATION_RATE = 0.01;
@@ -218,7 +228,7 @@ void main_function(int argc, char *argv[])
 
     // CROSSOVER
     eoCycleXover<Chrom> xover; // converge mto rapido
-    // eoPartiallyMappedXover<Chrom> xover;   //converge mt rapido
+	// eoPartiallyMappedXover<Chrom> xover;   //converge mt rapido
     // eoPrecedencePreserveXover<Chrom> xover;  //converge mto rapido
     // eoLinearOrderXover<Chrom> xover; // errado
     // eoOrderXover2<Chrom> xover; //converge mto rapido
@@ -250,7 +260,11 @@ int main(int argc, char **argv)
 {
     try
     {
-        main_function(argc, argv);
+        if (argc >= 2){
+            std::string instance_name = argv[1];
+            main_function(argc, instance_name);
+        }
+
     }
     catch (exception &e)
     {

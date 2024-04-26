@@ -1,0 +1,85 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "C/C++: gcc build active file",
+            "type": "cppbuild",
+            "command": "c++",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-std=c++17",
+                "-DPACKAGE=\"eo\"",
+                "-DVERSION=\"0.9.1\"",
+                "-I.",
+                "-I../../src",
+                "-Wall",
+                "-g",
+                "-c",
+                "academic_cvrp.cpp"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Linkar academic_cvrp",
+            "type": "cppbuild",
+            "command": "c++",
+            "args": [
+                "-std=c++17",
+                "-Wall",
+                "-g",
+                "-o",
+                "academic_cvrp",
+                "academic_cvrp.o",
+                "../../../build/lib/libeo.a",
+                "../../../build/lib/libeoutils.a"
+            ],
+            "group": "build",
+            "dependsOn": [
+                "Compilar academic_cvrp"
+            ]
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++ arquivo de build ativo",
+            "command": "/usr/bin/g++",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Tarefa gerada pelo Depurador."
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++-11 arquivo de build ativo",
+            "command": "/usr/bin/g++-11",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "Tarefa gerada pelo Depurador."
+        }
+    ]
+}

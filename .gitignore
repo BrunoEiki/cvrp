@@ -1,17 +1,3 @@
-### == CMAKE ==
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-compile_commands.json
-CTestTestfile.cmake
-deps
-*.cmake
-*.json
-
 # Prerequisites
 *.d
 

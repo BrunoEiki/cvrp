@@ -1,0 +1,16 @@
+{
+    "name": { "type": "string" },
+    "dimension": { "type": "number" },
+    "capacity": { "type": "number" },
+    "deliveries":
+        {
+            "id": { "type": "string" },
+            "point": 
+            {
+                "x": { "type": "number" },
+                "y": { "type": "number" }
+            },
+            "size": { "type": "number" }
+        },
+    "solution": { "type": "number" }
+}
