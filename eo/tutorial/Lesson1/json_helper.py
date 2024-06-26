@@ -174,7 +174,7 @@ def main_function():
     parser = argparse.ArgumentParser("json_helper")
     parser.add_argument(
         "target_path",
-        help="Target's path of the instance files. [Arnold], [Li-2005], [Vrp-Set-A/A], [Vrp-Set-XML100]",
+        help="Target's path of the instance files. [Arnold], [Li-2005], [Vrp-Set-A/A], [Vrp-Set-XML100], [XML100]",
         type=str,
     )
     args = parser.parse_args()
@@ -182,7 +182,7 @@ def main_function():
 
     # Caminho do arquivo .txt
     target_path = os.path.join(
-        os.getcwd(), "eo/tutorial/Lesson1/dataset", args.target_path
+        os.getcwd(), "dataset", args.target_path
     )
 
     instance_files, solution_files = get_all_file_names(target_path)
@@ -190,7 +190,7 @@ def main_function():
     solution_files.sort()
 
     for instance_file, solution_file in zip(instance_files, solution_files):
-        data = data_extraction_li2005(instance_file, solution_file, target_path)
+        data = data_extraction_setA(instance_file, solution_file, target_path)
 
         # Validando e imprimindo o JSON
         # validate_json(json_schema, json_str)

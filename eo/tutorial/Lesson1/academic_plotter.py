@@ -16,7 +16,7 @@ def is_float(value):
 # Leitura dos dados do primeiro arquivo
 def get_result(current_dir):
     data = {}
-    with open(f"{current_dir}/table_results_Li.txt", "r") as stream:
+    with open(f"{current_dir}/table_results_Uchoa.txt", "r") as stream:
         for line in stream:
             line = line.strip()
             if not (is_float(line)):
@@ -40,9 +40,9 @@ if __name__ =="__main__":
 
     # for xover in xover_names:
     data = get_result(current_dir)
-    print(data.keys())
+    print("MEAN")
     for i in data.values():
-        print(mean(i))
+        print(stdev(i))
 
 
 # # Criando o gráfico

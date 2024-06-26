@@ -163,7 +163,7 @@ void main_function(int argc, std::string instance_name)
     // std::string instance_name = argv[1];
 
     // std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Vrp-Set-A/A/" + instance_name;
-    std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Arnold/" + instance_name;
+    std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Uchoa/" + instance_name;
     std::ifstream f(fullPath);
     auto jsonDados = nlohmann::json::parse(f);
 
