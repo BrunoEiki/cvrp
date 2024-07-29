@@ -192,7 +192,7 @@ public:
 
     // cross.className()
     // std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/greedy_academic_result.txt", std::ios::out | std::ios::app);
-    std::ofstream out2("/home/eiki/cvrp/eo/tutorial/Lesson1/table_results_Uchoa.txt", std::ios::out | std::ios::app);
+    std::ofstream out2("/home/eiki/cvrp/eo/tutorial/Lesson1/temporario.txt", std::ios::out | std::ios::app);
 
     if (!out2)
     {
