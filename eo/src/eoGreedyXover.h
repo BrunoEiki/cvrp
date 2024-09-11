@@ -21,7 +21,7 @@
 // #include <random>
 
 /**
- * apply cycleXover on two chromosomes.
+ * apply greedyXover on two chromosomes.
  * Example:
  *
  * @ingroup Variators
