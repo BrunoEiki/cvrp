@@ -1,0 +1,246 @@
+tai150a.vrp
+
+real	0m0,011s
+user	0m0,007s
+sys	0m0,004s
+
+real	0m0,008s
+user	0m0,006s
+sys	0m0,002s
+
+real	0m0,013s
+user	0m0,007s
+sys	0m0,002s
+
+real	0m0,010s
+user	0m0,006s
+sys	0m0,003s
+
+real	0m0,007s
+user	0m0,006s
+sys	0m0,000s
+
+real	0m0,008s
+user	0m0,006s
+sys	0m0,002s
+
+real	0m0,030s
+user	0m0,008s
+sys	0m0,008s
+
+real	0m0,011s
+user	0m0,011s
+sys	0m0,000s
+
+real	0m0,007s
+user	0m0,007s
+sys	0m0,000s
+
+real	0m0,007s
+user	0m0,007s
+sys	0m0,000s
+tai150a.vrp
+
+real	0m0,008s
+user	0m0,005s
+sys	0m0,002s
+
+real	0m0,007s
+user	0m0,005s
+sys	0m0,002s
+
+real	0m0,007s
+user	0m0,004s
+sys	0m0,003s
+
+real	0m0,009s
+user	0m0,005s
+sys	0m0,003s
+
+real	0m0,007s
+user	0m0,006s
+sys	0m0,001s
+
+real	0m0,035s
+user	0m0,019s
+sys	0m0,007s
+
+real	0m0,019s
+user	0m0,006s
+sys	0m0,005s
+
+real	0m0,011s
+user	0m0,006s
+sys	0m0,004s
+
+real	0m0,052s
+user	0m0,019s
+sys	0m0,019s
+
+real	0m0,008s
+user	0m0,007s
+sys	0m0,000s
+tai150a.vrp
+
+real	0m0,006s
+user	0m0,004s
+sys	0m0,002s
+
+real	0m0,005s
+user	0m0,004s
+sys	0m0,001s
+
+real	0m0,005s
+user	0m0,003s
+sys	0m0,002s
+
+real	0m0,004s
+user	0m0,004s
+sys	0m0,000s
+
+real	0m0,005s
+user	0m0,004s
+sys	0m0,001s
+
+real	0m0,007s
+user	0m0,005s
+sys	0m0,001s
+
+real	0m0,017s
+user	0m0,009s
+sys	0m0,008s
+
+real	0m0,005s
+user	0m0,003s
+sys	0m0,002s
+
+real	0m0,004s
+user	0m0,003s
+sys	0m0,000s
+
+real	0m0,003s
+user	0m0,003s
+sys	0m0,000s
+tai150a.vrp
+
+real	0m0,011s
+user	0m0,005s
+sys	0m0,002s
+
+real	0m0,010s
+user	0m0,004s
+sys	0m0,002s
+
+real	0m0,029s
+user	0m0,011s
+sys	0m0,003s
+
+real	0m0,017s
+user	0m0,004s
+sys	0m0,004s
+
+real	0m0,051s
+user	0m0,000s
+sys	0m0,005s
+
+real	0m0,019s
+user	0m0,005s
+sys	0m0,001s
+
+real	0m0,011s
+user	0m0,003s
+sys	0m0,003s
+
+real	0m0,042s
+user	0m0,003s
+sys	0m0,004s
+
+real	0m0,022s
+user	0m0,002s
+sys	0m0,004s
+
+real	0m0,019s
+user	0m0,004s
+sys	0m0,000s
+tai150a.vrp
+
+real	0m0,004s
+user	0m0,004s
+sys	0m0,000s
+
+real	0m0,004s
+user	0m0,004s
+sys	0m0,000s
+
+real	0m0,004s
+user	0m0,003s
+sys	0m0,000s
+
+real	0m0,004s
+user	0m0,003s
+sys	0m0,001s
+
+real	0m0,005s
+user	0m0,002s
+sys	0m0,002s
+
+real	0m0,004s
+user	0m0,003s
+sys	0m0,001s
+
+real	0m0,004s
+user	0m0,004s
+sys	0m0,000s
+
+real	0m0,007s
+user	0m0,004s
+sys	0m0,000s
+
+real	0m0,017s
+user	0m0,010s
+sys	0m0,006s
+
+real	0m0,004s
+user	0m0,003s
+sys	0m0,001s
+tai150a.vrp
+
+real	0m19,386s
+user	0m17,900s
+sys	0m1,086s
+
+real	0m18,539s
+user	0m18,352s
+sys	0m0,155s
+
+real	0m16,589s
+user	0m15,220s
+sys	0m1,359s
+
+real	0m18,965s
+user	0m18,741s
+sys	0m0,188s
+
+real	0m15,780s
+user	0m13,563s
+sys	0m2,224s
+
+real	0m20,792s
+user	0m20,695s
+sys	0m0,058s
+
+real	0m16,596s
+user	0m16,196s
+sys	0m0,397s
+
+real	0m16,370s
+user	0m12,506s
+sys	0m3,863s
+
+real	0m17,876s
+user	0m17,626s
+sys	0m0,223s
+
+real	0m16,220s
+user	0m13,998s
+sys	0m2,222s

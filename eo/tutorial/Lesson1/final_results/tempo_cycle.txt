@@ -1,0 +1,205 @@
+A-n32-k5.vrp
+
+real	0m0,655s
+user	0m0,357s
+sys	0m0,066s
+
+real	0m0,401s
+user	0m0,332s
+sys	0m0,022s
+
+real	0m0,494s
+user	0m0,379s
+sys	0m0,043s
+
+real	0m0,498s
+user	0m0,329s
+sys	0m0,038s
+
+real	0m0,347s
+user	0m0,334s
+sys	0m0,006s
+
+real	0m0,356s
+user	0m0,279s
+sys	0m0,034s
+
+real	0m0,335s
+user	0m0,265s
+sys	0m0,036s
+
+real	0m0,368s
+user	0m0,310s
+sys	0m0,056s
+
+real	0m0,350s
+user	0m0,333s
+sys	0m0,016s
+
+real	0m0,493s
+user	0m0,474s
+sys	0m0,016s
+XML100_1111_01.vrp
+
+real	0m0,790s
+user	0m0,782s
+sys	0m0,003s
+
+real	0m0,763s
+user	0m0,748s
+sys	0m0,008s
+
+real	0m1,023s
+user	0m0,891s
+sys	0m0,059s
+
+real	0m0,844s
+user	0m0,800s
+sys	0m0,028s
+
+real	0m0,746s
+user	0m0,636s
+sys	0m0,091s
+
+real	0m0,642s
+user	0m0,583s
+sys	0m0,059s
+
+real	0m0,938s
+user	0m0,898s
+sys	0m0,015s
+
+real	0m0,758s
+user	0m0,673s
+sys	0m0,084s
+
+real	0m0,966s
+user	0m0,936s
+sys	0m0,023s
+
+real	0m0,787s
+user	0m0,680s
+sys	0m0,104s
+Li-21.vrp
+
+real	0m4,853s
+user	0m4,762s
+sys	0m0,071s
+
+real	0m4,689s
+user	0m4,620s
+sys	0m0,063s
+
+real	0m5,544s
+user	0m5,449s
+sys	0m0,088s
+
+real	0m6,792s
+user	0m6,656s
+sys	0m0,123s
+
+real	0m6,581s
+user	0m6,479s
+sys	0m0,046s
+
+real	0m4,956s
+user	0m4,056s
+sys	0m0,885s
+
+real	0m4,560s
+user	0m3,841s
+sys	0m0,714s
+
+real	0m4,270s
+user	0m3,950s
+sys	0m0,316s
+
+real	0m4,405s
+user	0m4,129s
+sys	0m0,254s
+
+real	0m4,737s
+user	0m4,259s
+sys	0m0,473s
+X-n1001-k43.vrp
+
+real	0m18,491s
+user	0m17,772s
+sys	0m0,257s
+
+real	0m18,972s
+user	0m18,319s
+sys	0m0,514s
+
+real	0m16,371s
+user	0m15,632s
+sys	0m0,707s
+
+real	0m13,117s
+user	0m12,857s
+sys	0m0,241s
+
+real	0m13,391s
+user	0m13,131s
+sys	0m0,232s
+
+real	0m14,823s
+user	0m14,565s
+sys	0m0,244s
+
+real	0m13,252s
+user	0m12,963s
+sys	0m0,213s
+
+real	0m11,388s
+user	0m10,660s
+sys	0m0,618s
+
+real	0m11,770s
+user	0m9,771s
+sys	0m1,985s
+
+real	0m12,643s
+user	0m10,348s
+sys	0m2,243s
+tai150a.vrp
+
+real	0m1,453s
+user	0m1,438s
+sys	0m0,007s
+
+real	0m1,620s
+user	0m1,609s
+sys	0m0,004s
+
+real	0m1,458s
+user	0m1,450s
+sys	0m0,005s
+
+real	0m1,989s
+user	0m1,977s
+sys	0m0,008s
+
+real	0m1,517s
+user	0m1,512s
+sys	0m0,003s
+
+real	0m1,804s
+user	0m1,796s
+sys	0m0,007s
+
+real	0m1,344s
+user	0m1,338s
+sys	0m0,005s
+
+real	0m1,544s
+user	0m1,539s
+sys	0m0,003s
+
+real	0m1,205s
+user	0m1,132s
+sys	0m0,066s
+
+real	0m1,403s
+user	0m1,394s
+sys	0m0,008s

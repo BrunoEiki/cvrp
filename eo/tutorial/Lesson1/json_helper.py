@@ -64,8 +64,10 @@ def data_extraction_setA(instance_file, solution_file, target_path):
     with open(os.path.join(target_path, instance_file), "r") as txt_file:
         lines = txt_file.readlines()
 
-    find_second_number = r"\b\d+\s+(\d+)\s+\d+\b"
-    find_third_number = r"\b\d+\s+\d+\s+(\d+)\b"
+    # find_second_number = r"\b\d+\s+(\d+)\s+\d+\b"
+    # find_third_number = r"\b\d+\s+\d+\s+(\d+)\b"
+    find_second_number = r"\b-?\d+\s+(-?\d+)\s+-?\d+\b"
+    find_third_number = r"\b-?\d+\s+-?\d+\s+(-?\d+)\b"
     init_coord_section = 7
 
     # Extração dos dados do arquivo .txt
@@ -73,9 +75,10 @@ def data_extraction_setA(instance_file, solution_file, target_path):
     data["dimension"] = int(lines[3].split(":")[1].strip()) - 1
     data["capacity"] = int(lines[5].split(":")[1].strip())
 
+
+
     origin_x = float(re.findall(find_second_number, lines[init_coord_section])[0])
     origin_y = float(re.findall(find_third_number, lines[init_coord_section])[0])
-
     data["origin"] = {"x": origin_x, "y": origin_y}
 
     # Extração das coordenadas dos pontos
@@ -190,7 +193,7 @@ def main_function():
     solution_files.sort()
 
     for instance_file, solution_file in zip(instance_files, solution_files):
-        data = data_extraction_setA(instance_file, solution_file, target_path)
+        data = data_extraction_li2005(instance_file, solution_file, target_path)
 
         # Validando e imprimindo o JSON
         # validate_json(json_schema, json_str)

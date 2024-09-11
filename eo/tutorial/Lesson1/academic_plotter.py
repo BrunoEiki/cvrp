@@ -14,9 +14,9 @@ def is_float(value):
 
 
 # Leitura dos dados do primeiro arquivo
-def get_result(current_dir):
+def get_result(current_dir, data_file):
     data = {}
-    with open(f"{current_dir}/table_results_Uchoa.txt", "r") as stream:
+    with open(f"{current_dir}/cumulative_results/{data_file}", "r") as stream:
         for line in stream:
             line = line.strip()
             if not (is_float(line)):
@@ -30,33 +30,40 @@ def get_result(current_dir):
 if __name__ =="__main__":
     xover_names = [
         "greedy",
-        "cycle",
         "pm",
+        "cycle",
+        "order",
         "precedence",
-        "order" 
+        "gox"
     ]
     
     current_dir = pathlib.Path(__file__).parent.resolve()
+    data_file = sys.argv[1]
 
     # for xover in xover_names:
-    data = get_result(current_dir)
-    print("MEAN")
-    for i in data.values():
-        print(stdev(i))
+    data = get_result(current_dir, data_file)
+    # print("MEAN")
+    # for i in data.values():
+        # print(stdev(i))
 
 
-# # Criando o gráfico
-# plt.plot(data[0], label="Execução 1")
-# plt.plot(data[1], label="Execução 2")
+    # # Criando o gráfico
+    plt.plot(data[xover_names[0]], label="gx")
+    plt.plot(data[xover_names[1]], label="pm")
+    plt.plot(data[xover_names[2]], label="cycle")
+    plt.plot(data[xover_names[3]], label="order")
+    plt.plot(data[xover_names[4]], label="precedencee")
+    plt.plot(data[xover_names[5]], label="gox")
 
 
-# # Adicionando rótulos e título
-# plt.xlabel("Gerações")
-# plt.ylabel("Distância (Km)")
-# plt.title(f"Gráfico de Linhas - {sys.argv[1]}")
 
-# # Adicionando uma legenda
-# plt.legend()
+    # # Adicionando rótulos e título
+    plt.xlabel("Gerações")
+    plt.ylabel("Distância")
+    plt.title(f"Gráfico de Linhas - {sys.argv[1]}")
 
-# # Exibindo o gráfico
-# plt.show()
+    # # Adicionando uma legenda
+    plt.legend()
+
+    # # Exibindo o gráfico
+    plt.show()

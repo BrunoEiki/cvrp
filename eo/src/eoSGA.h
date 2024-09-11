@@ -191,10 +191,11 @@ public:
     eoPop<EOT> offspring;
 
     // cross.className()
-    // std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/greedy_academic_result.txt", std::ios::out | std::ios::app);
-    std::ofstream out2("/home/eiki/cvrp/eo/tutorial/Lesson1/table_results_Uchoa.txt", std::ios::out | std::ios::app);
+    std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/cumulative_results/all_generations_XML100_1111_01.txt", std::ios::out | std::ios::app);
+    // std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/li_vehicles.txt", std::ios::out | std::ios::app);
+    // std::ofstream out2("/home/eiki/cvrp/eo/tutorial/Lesson1/last_generation_teste.txt", std::ios::out | std::ios::app);
 
-    if (!out2)
+    if (!out)
     {
       std::cerr << "Erro ao abrir o arquivo.\n";
     }
@@ -237,19 +238,19 @@ public:
 
       // ! get only the total distance
       // ! Slice 6:17 to get only the value and make sum easier
-      // out << bestof_generation.str().substr(0, 10) << ",";
+      out << bestof_generation.str().substr(0, 10) << "\n";
       // out << bestof_generation.str() << "\n";
 
       std::stringstream().swap(bestof_generation);
 
     } while (cont(_pop));
     // out << "\n";
-    std::stringstream bestof_generation2;
-    bestof_generation2 << std::fixed << _pop.back();
-    out2 << bestof_generation2.str().substr(0, 10) << "\n";
+    // std::stringstream bestof_generation2;
+    // bestof_generation2 << std::fixed << _pop.back();
+    // out2 << bestof_generation2.str().substr(0, 10) << "\n";
 
-    // out.close();
-    out2.close();
+    out.close();
+    // out2.close();
   }
 
 private:

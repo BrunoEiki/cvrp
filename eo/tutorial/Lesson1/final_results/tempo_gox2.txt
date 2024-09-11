@@ -1,0 +1,38 @@
+X-n1001-k43.vrp
+
+real	15m42,728s
+user	87m26,940s
+sys	1m27,135s
+
+real	162m4,818s
+user	66m52,534s
+sys	21m56,627s
+
+real	92m42,178s
+user	92m35,122s
+sys	0m9,178s
+
+real	90m3,106s
+user	80m2,718s
+sys	10m0,348s
+
+real	88m56,230s
+user	82m17,942s
+sys	6m38,222s
+
+real	87m54,210s
+user	86m28,673s
+sys	1m25,562s
+
+real	90m54,148s
+user	89m54,863s
+sys	0m58,977s
+
+real	91m50,145s
+user	78m30,149s
+sys	13m16,107s
+X-n1001-k43.vrp
+
+real	117m18,684s
+user	114m6,362s
+sys	1m35,570s

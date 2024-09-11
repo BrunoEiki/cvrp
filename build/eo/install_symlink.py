@@ -2,8 +2,8 @@
 
 #NAME    = "ParadisEO"
 NAME    = "eo"
-SOURCE  = "/home/bruno/paradiseo"
-BINARY  = "/home/bruno/paradiseo/build"
+SOURCE  = "/home/eiki/cvrp"
+BINARY  = "/home/eiki/cvrp/build"
 PREFIX  = "/usr"
 
 DATA = {

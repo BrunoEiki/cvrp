@@ -1,0 +1,10 @@
+Li-21.vrp
+Li-21.vrp
+
+real	1m6,768s
+user	1m0,861s
+sys	0m4,959s
+
+real	1m38,986s
+user	1m38,297s
+sys	0m0,328s

@@ -11,7 +11,7 @@
 #include <cmath>
 #include <algorithm>
 #include <numeric>
-
+#include <limits.h>
 
 #include <nlohmann/json.hpp>
 
@@ -28,6 +28,7 @@
 #include <eoPrecedencePreserveXover.h>
 #include <eoPartiallyMappedXover.h>
 #include <eoGreedyXover.h>
+#include <eoGreedyOrderXover.h>
 #include <eoTwoOptMutation.h>
 
 using namespace std;
@@ -37,6 +38,8 @@ std::pair<double, double> origin;                   // ponto de partida
 std::vector<std::pair<double, double>> coordenadas; // pontos de entregas
 std::vector<int> pesos;                             // peso de cada entrega
 int capacity;
+int minimum_vehicles;
+int infinity = std::numeric_limits<int>::max();
 
 std::vector<std::vector<double>> *matrix; // matriz com distâncias euclidianas
 
@@ -118,13 +121,14 @@ double real_value(const Chrom &_chrom)
 
     int i = 0;
     int j = 1;
-    int veiculo = 0;
+    int veiculo = 1;
     distancia_veiculo = (*matrix)[num_deliveries][_chrom[i]];
     int sum_of_elems = std::accumulate(pesos.begin(), pesos.end(), 0);
     
     // std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/customers.txt", std::ios::out | std::ios::app);
 
-    while (j < num_deliveries)
+
+    while (j < num_deliveries && veiculo <= minimum_vehicles)
     {
         if ((peso_atual + pesos[_chrom[j]] > carga_max))
         {
@@ -137,7 +141,10 @@ double real_value(const Chrom &_chrom)
             veiculo++;
         }
         else
-        {
+        {   
+            if (veiculo > minimum_vehicles){
+                throw std::runtime_error("Número de Veículos ultrapassou o valor ótimo!");
+            }
             peso_atual += pesos[_chrom[j]];
             distancia_veiculo += (*matrix)[_chrom[i]][_chrom[j]];
         }
@@ -150,6 +157,11 @@ double real_value(const Chrom &_chrom)
         peso_total += peso_atual;
         total_distancia_veiculos += distancia_veiculo +  (*matrix)[num_deliveries][_chrom[i]];
     }
+
+    if (veiculo < minimum_vehicles){
+        throw std::runtime_error("Menos Veiculos que o valor ótimo!");
+    }
+
     return total_distancia_veiculos;
 }
 
@@ -163,12 +175,15 @@ void main_function(int argc, std::string instance_name)
     // std::string instance_name = argv[1];
 
     // std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Vrp-Set-A/A/" + instance_name;
-    std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Uchoa/" + instance_name;
+    // std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Uchoa/" + instance_name;
+    std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/" + instance_name;
+
     std::ifstream f(fullPath);
     auto jsonDados = nlohmann::json::parse(f);
 
     capacity = jsonDados["capacity"];
     int dimension = jsonDados["dimension"];
+    minimum_vehicles = jsonDados["minimum_vehicles"];
     origin = {jsonDados["origin"]["x"], jsonDados["origin"]["y"]};
 
     if (jsonDados["deliveries"].is_array())
@@ -226,14 +241,18 @@ void main_function(int argc, std::string instance_name)
     eoDetTournamentSelect<Chrom> select(TOURNAMENT_SIZE);
     // eoDeterministicSaDReplacement<Chrom> select(10, 10);
 
+    // o ver será substituido aqui pelo bash.
     // CROSSOVER
-    eoCycleXover<Chrom> xover; // converge mto rapido
+    
+    // eoGreedyXover<Chrom> xover(*matrix);
 	// eoPartiallyMappedXover<Chrom> xover;   //converge mt rapido
+    // eoCycleXover<Chrom> xover; // converge mto rapido
+    // eoOrderXover<Chrom> xover;
     // eoPrecedencePreserveXover<Chrom> xover;  //converge mto rapido
+    eoGreedyOrderXover<Chrom> xover(*matrix, pesos, 10);
+    
     // eoLinearOrderXover<Chrom> xover; // errado
     // eoOrderXover2<Chrom> xover; //converge mto rapido
-    // eoOrderXover<Chrom> xover;
-    // eoGreedyXover<Chrom> xover(*matrix);
 
     // MUTATION
     // eoUniformMutation<Chrom> mutation(EPSILON);
@@ -243,9 +262,11 @@ void main_function(int argc, std::string instance_name)
     // stop after MAX_GEN generations
     eoGenContinue<Chrom> continuator(MAX_GEN);
 
+    std::stringstream instance_path;
+
     // TERMINATION CONDITION
     eoSGA<Chrom> gga(select, xover, CROSS_RATE,
-                     mutation, MUTATION_RATE, eval, continuator);
+                    mutation, MUTATION_RATE, eval, continuator);
 
     gga(pop);
 
