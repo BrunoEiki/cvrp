@@ -2,7 +2,6 @@
 	"name": "Antwerp1",
 	"dimension": 6000,
 	"capacity": 30,
-	"minimum_vehicles": 343,
 	"origin": { "x": 1000.0, "y": 1000.0 },
 	"deliveries": [
 		{ "id": 0, "point": { "x": 602.0, "y": 870.0 }, "size": 3 },

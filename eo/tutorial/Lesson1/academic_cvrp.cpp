@@ -38,7 +38,7 @@ std::pair<double, double> origin;                   // ponto de partida
 std::vector<std::pair<double, double>> coordenadas; // pontos de entregas
 std::vector<int> pesos;                             // peso de cada entrega
 int capacity;
-int minimum_vehicles;
+// int minimum_vehicles;
 int infinity = std::numeric_limits<int>::max();
 
 std::vector<std::vector<double>> *matrix; // matriz com distâncias euclidianas
@@ -128,7 +128,7 @@ double real_value(const Chrom &_chrom)
     // std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/customers.txt", std::ios::out | std::ios::app);
 
 
-    while (j < num_deliveries && veiculo <= minimum_vehicles)
+    while (j < num_deliveries) //&& veiculo <= minimum_vehicles
     {
         if ((peso_atual + pesos[_chrom[j]] > carga_max))
         {
@@ -142,9 +142,9 @@ double real_value(const Chrom &_chrom)
         }
         else
         {   
-            if (veiculo > minimum_vehicles){
-                throw std::runtime_error("Número de Veículos ultrapassou o valor ótimo!");
-            }
+            // if (veiculo > minimum_vehicles){
+            //     throw std::runtime_error("Número de Veículos ultrapassou o valor ótimo!");
+            // }
             peso_atual += pesos[_chrom[j]];
             distancia_veiculo += (*matrix)[_chrom[i]][_chrom[j]];
         }
@@ -158,9 +158,9 @@ double real_value(const Chrom &_chrom)
         total_distancia_veiculos += distancia_veiculo +  (*matrix)[num_deliveries][_chrom[i]];
     }
 
-    if (veiculo < minimum_vehicles){
-        throw std::runtime_error("Menos Veiculos que o valor ótimo!");
-    }
+    // if (veiculo < minimum_vehicles){
+    //     throw std::runtime_error("Menos Veiculos que o valor ótimo!");
+    // }
 
     return total_distancia_veiculos;
 }
@@ -183,7 +183,7 @@ void main_function(int argc, std::string instance_name)
 
     capacity = jsonDados["capacity"];
     int dimension = jsonDados["dimension"];
-    minimum_vehicles = jsonDados["minimum_vehicles"];
+    // minimum_vehicles = jsonDados["minimum_vehicles"];
     origin = {jsonDados["origin"]["x"], jsonDados["origin"]["y"]};
 
     if (jsonDados["deliveries"].is_array())
@@ -248,8 +248,8 @@ void main_function(int argc, std::string instance_name)
 	// eoPartiallyMappedXover<Chrom> xover;   //converge mt rapido
     // eoCycleXover<Chrom> xover; // converge mto rapido
     // eoOrderXover<Chrom> xover;
-    // eoPrecedencePreserveXover<Chrom> xover;  //converge mto rapido
-    eoGreedyOrderXover<Chrom> xover(*matrix, pesos, 10);
+    eoPrecedencePreserveXover<Chrom> xover;  //converge mto rapido
+    // eoGreedyOrderXover<Chrom> xover(*matrix, pesos, 10);
     
     // eoLinearOrderXover<Chrom> xover; // errado
     // eoOrderXover2<Chrom> xover; //converge mto rapido

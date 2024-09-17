@@ -191,7 +191,7 @@ public:
     eoPop<EOT> offspring;
 
     // cross.className()
-    std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/cumulative_results/all_generations_XML100_1111_01.txt", std::ios::out | std::ios::app);
+    std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/cumulative_results/all_generations_Brussels1.txt", std::ios::out | std::ios::app);
     // std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/li_vehicles.txt", std::ios::out | std::ios::app);
     // std::ofstream out2("/home/eiki/cvrp/eo/tutorial/Lesson1/last_generation_teste.txt", std::ios::out | std::ios::app);
 

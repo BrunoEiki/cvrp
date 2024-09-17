@@ -29,8 +29,8 @@ def get_result(current_dir, data_file):
 
 if __name__ =="__main__":
     xover_names = [
-        "greedy",
-        "pm",
+        # "greedy",
+        # "pm",
         "cycle",
         "order",
         "precedence",
@@ -48,12 +48,12 @@ if __name__ =="__main__":
 
 
     # # Criando o gráfico
-    plt.plot(data[xover_names[0]], label="gx")
-    plt.plot(data[xover_names[1]], label="pm")
-    plt.plot(data[xover_names[2]], label="cycle")
-    plt.plot(data[xover_names[3]], label="order")
-    plt.plot(data[xover_names[4]], label="precedencee")
-    plt.plot(data[xover_names[5]], label="gox")
+    # plt.plot(data[xover_names[0]], label="gx")
+    # plt.plot(data[xover_names[0]], label="pm")
+    plt.plot(data[xover_names[0]], label="cycle")
+    plt.plot(data[xover_names[1]], label="order")
+    plt.plot(data[xover_names[2]], label="precedencee")
+    plt.plot(data[xover_names[3]], label="gox")
 
 
 

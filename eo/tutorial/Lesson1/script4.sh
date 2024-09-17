@@ -14,10 +14,10 @@ c++ -std=c++17 -DPACKAGE=\"eo\" -DVERSION=\"0.9.1\" -I. -I../../src -Wall -g -c 
 
 c++ -std=c++17 -Wall -g -o academic_cvrp academic_cvrp.o ../../../build/lib/libeo.a ../../../build/lib/libeoutils.a
 
-crossover=gox
+crossover=precedence
 
 for instance in ${instances[@]}; do
 	# o argumento eh o nome do crossover
-	echo "${crossover}" >> "./cumulative_results/all_generations_XML100_1111_01.txt"
+	echo "${crossover}" >> "./cumulative_results/all_generations_Brussels1.txt"
 	./academic_cvrp "$1.vrp.json"
 done
