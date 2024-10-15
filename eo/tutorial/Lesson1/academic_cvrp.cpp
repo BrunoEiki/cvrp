@@ -1,3 +1,4 @@
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -10,9 +11,11 @@
 #include <fstream>
 #include <cmath>
 #include <algorithm>
+#include <numeric>
+#include <limits.h>
 
-#include <curl/curl.h>
 #include <nlohmann/json.hpp>
+#include <curl/curl.h>
 
 #include <eo>
 #include <es.h>
@@ -26,9 +29,14 @@
 #include <eoCycleXover.h>
 #include <eoPrecedencePreserveXover.h>
 #include <eoPartiallyMappedXover.h>
+#include <eoGreedyXover.h>
+#include <eoGreedyOrderXover.h>
 #include <eoTwoOptMutation.h>
 
 using namespace std;
+
+std::ifstream file("./cvrp-2-rj-17.json");
+nlohmann::json jsonDados;
 
 static size_t WriteCallback(char *contents, size_t size, size_t nmemb, char *buffer_in)
 {
@@ -37,12 +45,16 @@ static size_t WriteCallback(char *contents, size_t size, size_t nmemb, char *buf
 }
 
 // VARIAVEIS GLOBAIS
-std::ifstream file("./cvrp-2-rj-17.json");
-nlohmann::json jsonDados;
-
-std::pair<double, double> origem;                   // ponto de partida
+std::pair<double, double> origin;                   // ponto de partida
 std::vector<std::pair<double, double>> coordenadas; // pontos de entregas
 std::vector<int> pesos;                             // peso de cada entrega
+int capacity;
+// int minimum_vehicles;
+int infinity = std::numeric_limits<int>::max();
+
+std::vector<std::vector<double>> *matrix; // matriz com distâncias euclidianas
+
+std::string readBuffer;
 
 double lng, lat;
 
@@ -51,7 +63,48 @@ double lng, lat;
 // define your individuals
 // typedef eoReal<double> Indi;
 
+// typedef eoVector<double, int32_t> Chrom;
+
 typedef eoInt<double> Chrom;
+
+
+double euclidian_distance(double x1_point, double y1_point, double x2_point, double y2_point)
+{
+    return sqrt(pow(x2_point - x1_point, 2) + pow(y2_point - y1_point, 2));
+}
+
+void create_distance_matrix(std::vector<std::vector<double>> &matrix, int individual_size)
+{
+    const size_t numDeliveries = individual_size;
+    // std::vector<std::vector<double>> *matrix = new std::vector<std::vector<double>>(numDeliveries + 1.0, std::vector<double>(numDeliveries + 1.0, 0.0));
+
+    for (size_t i = 0; i < numDeliveries; i++)
+    {
+        // 1. Não existe distância entre entrega de índice igual
+        // 2. A origem não está entre os pontos de entrega
+        // 3. Convencionou-se que a distância da origem até a primeira
+        // entrega (ou entrega 0) está na extremidade da matriz. Se
+        // existem 5 entregas, a matriz terá tamanho 6 e tal distância
+        // vai estar em [i][5]
+
+        double originDist = euclidian_distance(origin.first, origin.second,
+                                               coordenadas[i].first, coordenadas[i].second);
+        matrix[numDeliveries][i] = originDist;
+        matrix[i][numDeliveries] = originDist;
+
+        for (size_t j = 0; j < numDeliveries; j++)
+        {
+            if (i != j)
+            {
+                // double dist = routingService->distanceBetween(currentDelivery.point, instance.deliveries.at(j).point);
+                double dist = euclidian_distance(coordenadas[i].first, coordenadas[i].second,
+                                                 coordenadas[j].first, coordenadas[j].second);
+                matrix[i][j] = dist;
+                matrix[j][i] = dist;
+            }
+        }
+    }
+};
 
 void gerarVetorAleatorio(Chrom &_chrom, int n)
 {
@@ -70,6 +123,64 @@ void gerarVetorAleatorio(Chrom &_chrom, int n)
 // uma função fitness que calcula a distância total percorrida mantendo a restrição
 // de capacidade.
 //    @param _indi Um indivíduo de valores reais
+// double real_value(const Chrom &_chrom)
+// {
+    // std::string entregas;
+    // int carga_max = capacity; // Carga Maxima padrao = 180
+    // int num_deliveries = pesos.size();
+    // int peso_atual = pesos[_chrom[0]];
+    // int peso_total = 0;
+    // double distancia_veiculo = 0.0;
+    // double total_distancia_veiculos = 0.0;
+// 
+    // int i = 0;
+    // int j = 1;
+    // int veiculo = 1;
+    // distancia_veiculo = (*matrix)[num_deliveries][_chrom[i]];
+    // int sum_of_elems = std::accumulate(pesos.begin(), pesos.end(), 0);
+    // 
+    // // std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/customers.txt", std::ios::out | std::ios::app);
+// 
+// 
+    // while (j < num_deliveries) //&& veiculo <= minimum_vehicles
+    // {
+        // if ((peso_atual + pesos[_chrom[j]] > carga_max))
+        // {
+            // peso_total += peso_atual;
+            // total_distancia_veiculos += distancia_veiculo + (*matrix)[num_deliveries][_chrom[i]]; // last customer to origin point
+// 
+            // // reset variables
+            // peso_atual = pesos[_chrom[j]];
+            // distancia_veiculo = (*matrix)[num_deliveries][_chrom[j]];
+            // veiculo++;
+        // }
+        // else
+        // {
+            // // if (veiculo > minimum_vehicles){
+            // //     throw std::runtime_error("Número de Veículos ultrapassou o valor ótimo!");
+            // // }
+            // peso_atual += pesos[_chrom[j]];
+            // distancia_veiculo += (*matrix)[_chrom[i]][_chrom[j]];
+        // }
+        // i++;
+        // j++;
+    // }
+    // 
+    // if (peso_total != sum_of_elems)
+    // {
+        // peso_total += peso_atual;
+        // total_distancia_veiculos += distancia_veiculo +  (*matrix)[num_deliveries][_chrom[i]];
+    // }
+// 
+    // // if (veiculo < minimum_vehicles){
+    // //     throw std::runtime_error("Menos Veiculos que o valor ótimo!");
+    // // }
+// 
+    // return total_distancia_veiculos;
+// }
+// 
+
+
 double real_value(const Chrom &_chrom)
 {
 
@@ -95,7 +206,7 @@ double real_value(const Chrom &_chrom)
         peso_atual = 0;
 
         // * Hub coordinate
-        coordinate << origem.first << "," << origem.second << ";";
+        coordinate << origin.first << "," << origin.second << ";";
         while (true)
         {
             if ((i == pop_size) || (peso_atual + pesos[_chrom[i]] > carga_max))
@@ -106,7 +217,7 @@ double real_value(const Chrom &_chrom)
             i++;
         }
         // Return back to hub
-        coordinate << origem.first << "," << origem.second;\
+        coordinate << origin.first << "," << origin.second;\
 
         // ==========================================================
         // REQUISITAR CALCULO DE DISTANCIA NO SERVIDOR LOCAL DO OSRM
@@ -131,7 +242,7 @@ double real_value(const Chrom &_chrom)
                 nlohmann::json jsonObject = nlohmann::json::parse(readBuffer);
                 // ! DOUBLE CHECK
                 soma_distancia += jsonObject["routes"][0]["distance"].get<double>();
-            }p
+            }
             else
             {
                 std::cerr << "Erro ao realizar a solicitação HTTP: " << curl_easy_strerror(res) << std::endl;
@@ -142,26 +253,47 @@ double real_value(const Chrom &_chrom)
     return soma_distancia;
 }
 
-void main_function(int /*argc*/, char ** /*argv*/)
+
+void main_function(int argc, std::string instance_name)
 {
+    /*
+     * argv[1]: json file name
+     */
     std::cout << fixed;
 
-    // =======================================
-    // IMPORTAR AS COORDENADAS DAS ENTREGAS
-    // =======================================
-    file >> jsonDados;
+    // std::string instance_name = argv[1];
+
+    // std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Vrp-Set-A/A/" + instance_name;
+    // std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Uchoa/" + instance_name;
+
+
+
+// 
+    // std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/" + instance_name;
+// 
+    // std::ifstream f(fullPath);
+    // auto jsonDados = nlohmann::json::parse(f);
+
+
+	file >> jsonDados;
 
     // ! osrm requer primeiro "lng" depois "lat".
     lng = jsonDados["origin"]["lng"].get<double>();
     lat = jsonDados["origin"]["lat"].get<double>();
-    origem = {lng, lat};
+    origin = {lng, lat};
+
+// 
+    // capacity = jsonDados["capacity"];
+    int dimension = jsonDados["dimension"];
+    // minimum_vehicles = jsonDados["minimum_vehicles"];
+    origin = {jsonDados["origin"]["x"], jsonDados["origin"]["y"]};
 
     if (jsonDados["deliveries"].is_array())
     {
         for (const auto &entrega : jsonDados["deliveries"])
         {
-            lng = entrega["point"]["lng"].get<double>();
-            lat = entrega["point"]["lat"].get<double>();
+            lng = entrega["point"]["x"].get<double>();
+            lat = entrega["point"]["y"].get<double>();
             coordenadas.emplace_back(lng, lat);
 
             pesos.emplace_back(entrega["size"]);
@@ -172,16 +304,16 @@ void main_function(int /*argc*/, char ** /*argv*/)
     //       PARAMETROS
     // ========================
     const unsigned int SEED = 42;
-    const unsigned int IND_SIZE = pesos.size(); // Tamanho do indivíduo (solução)
-    const unsigned int POP_SIZE = 100;           // Tamanho da população
-    const unsigned int MAX_GEN = 300;
+    const unsigned int IND_SIZE = dimension; // Tamanho do indivíduo (solução).
+    const unsigned int POP_SIZE = 100;        // Tamanho da população. Padrão = 80. 200
+    const unsigned int MAX_GEN = 300;        // Número de gerações. Padrão 100. 1000
     const unsigned int TOURNAMENT_SIZE = 2;
-    // const double EPSILON = 0.01; // range for real uniform mutation
     const float CROSS_RATE = 0.8;
-    // const double BIT_MUTATION_PROB = 0.02;
     const float MUTATION_RATE = 0.01;
 
     rng.reseed(SEED);
+    matrix = new std::vector<std::vector<double>>(IND_SIZE + 1, std::vector<double>(IND_SIZE + 1, 0.0));
+    create_distance_matrix(*matrix, IND_SIZE);
 
     // EVAL
     /////////////////////////////
@@ -207,23 +339,22 @@ void main_function(int /*argc*/, char ** /*argv*/)
         pop.push_back(v); // and put it in the population
     }
 
-    // pop.sort();
-    // cout << "\n\nCONFIGURAÇAO INICIAL";
-    // cout << "\n===========================";
-    // cout << "\nDistTot  Tam   Indices";
-    // cout << "\n=========================== pop: " << pop;
-
     // SELECTION
     eoDetTournamentSelect<Chrom> select(TOURNAMENT_SIZE);
     // eoDeterministicSaDReplacement<Chrom> select(10, 10);
 
+    // o ver será substituido aqui pelo bash.
     // CROSSOVER
+    
+    eoGreedyXover<Chrom> xover(*matrix);
+	// eoPartiallyMappedXover<Chrom> xover;   //converge mt rapido
     // eoCycleXover<Chrom> xover; // converge mto rapido
-    // eoPartiallyMappedXover<Chrom> xover;   //converge mt rapido
+    // eoOrderXover<Chrom> xover;
     // eoPrecedencePreserveXover<Chrom> xover;  //converge mto rapido
+    // eoGreedyOrderXover<Chrom> xover(*matrix, pesos, 10);
+    
     // eoLinearOrderXover<Chrom> xover; // errado
     // eoOrderXover2<Chrom> xover; //converge mto rapido
-    // eoOrderXover<Chrom> xover; // menos pior
 
     // MUTATION
     // eoUniformMutation<Chrom> mutation(EPSILON);
@@ -233,9 +364,11 @@ void main_function(int /*argc*/, char ** /*argv*/)
     // stop after MAX_GEN generations
     eoGenContinue<Chrom> continuator(MAX_GEN);
 
+    std::stringstream instance_path;
+
     // TERMINATION CONDITION
     eoSGA<Chrom> gga(select, xover, CROSS_RATE,
-                     mutation, MUTATION_RATE, eval, continuator);
+                    mutation, MUTATION_RATE, eval, continuator);
 
     gga(pop);
 
@@ -250,7 +383,11 @@ int main(int argc, char **argv)
 {
     try
     {
-        main_function(argc, argv);
+        if (argc >= 2){
+            std::string instance_name = argv[1];
+            main_function(argc, instance_name);
+        }
+
     }
     catch (exception &e)
     {
@@ -258,5 +395,3 @@ int main(int argc, char **argv)
     }
     return 1;
 }
-
-// (25773, 200000 + 33986, 800000 + 31799, 400000 + 31799, 400000 + 28334, 400000) / 5
