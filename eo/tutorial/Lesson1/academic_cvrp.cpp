@@ -73,11 +73,57 @@ double euclidian_distance(double x1_point, double y1_point, double x2_point, dou
     return sqrt(pow(x2_point - x1_point, 2) + pow(y2_point - y1_point, 2));
 }
 
+double osrm_distance_request(double ix, double iy, double jx, double jy) {
+    // VARIAVEIS PARA REQUISIÇÃO
+    CURL *curl;
+    CURLcode res;
+    std::string readBuffer;
+    std::string url;
+
+    std::string entregas;
+    std::stringstream coordinate;
+    std::stringstream requisicao;
+    double dist;
+
+    curl = curl_easy_init();
+
+    if (curl)
+    {
+        coordinate << ix << "," << iy << ";";
+        coordinate << jx << "," << jy << ";";
+
+        entregas = coordinate.str();
+        requisicao << "http://localhost:5000/route/v1/driving/" + entregas + "?annotations=distance&continue_straight=false";
+        url = requisicao.str();
+        
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+
+        res = curl_easy_perform(curl);
+
+        if (res == CURLE_OK)
+        {
+            // SOMAR AS DISTANCIAS DE CADA VEICULO
+            nlohmann::json jsonObject = nlohmann::json::parse(readBuffer);
+            dist = jsonObject["routes"][0]["distance"].get<double>();
+        }
+        else
+        {
+            std::cerr << "Erro ao realizar a solicitação HTTP: " << curl_easy_strerror(res) << std::endl;
+        }
+    }
+    curl_easy_cleanup(curl);
+    return dist;
+}
+
 void create_distance_matrix(std::vector<std::vector<double>> &matrix, int individual_size)
 {
+    double dist;
     const size_t numDeliveries = individual_size;
     // std::vector<std::vector<double>> *matrix = new std::vector<std::vector<double>>(numDeliveries + 1.0, std::vector<double>(numDeliveries + 1.0, 0.0));
 
+    
     for (size_t i = 0; i < numDeliveries; i++)
     {
         // 1. Não existe distância entre entrega de índice igual
@@ -86,9 +132,7 @@ void create_distance_matrix(std::vector<std::vector<double>> &matrix, int indivi
         // entrega (ou entrega 0) está na extremidade da matriz. Se
         // existem 5 entregas, a matriz terá tamanho 6 e tal distância
         // vai estar em [i][5]
-
-        double originDist = euclidian_distance(origin.first, origin.second,
-                                               coordenadas[i].first, coordenadas[i].second);
+        dist = euclidian_distance(origin.first, origin.second, coordenadas[i].first, coordenadas[i].second);
         matrix[numDeliveries][i] = originDist;
         matrix[i][numDeliveries] = originDist;
 
@@ -96,14 +140,15 @@ void create_distance_matrix(std::vector<std::vector<double>> &matrix, int indivi
         {
             if (i != j)
             {
-                // double dist = routingService->distanceBetween(currentDelivery.point, instance.deliveries.at(j).point);
-                double dist = euclidian_distance(coordenadas[i].first, coordenadas[i].second,
-                                                 coordenadas[j].first, coordenadas[j].second);
+                dist = osrm_distance_request(coordenadas[_chrom[i]].first, coordenadas[_chrom[i]].second,
+                                            coordenadas[_chrom[j]].first, coordenadas[_chrom[j]].second);
                 matrix[i][j] = dist;
                 matrix[j][i] = dist;
             }
         }
     }
+
+
 };
 
 void gerarVetorAleatorio(Chrom &_chrom, int n)
@@ -123,134 +168,60 @@ void gerarVetorAleatorio(Chrom &_chrom, int n)
 // uma função fitness que calcula a distância total percorrida mantendo a restrição
 // de capacidade.
 //    @param _indi Um indivíduo de valores reais
-// double real_value(const Chrom &_chrom)
-// {
-    // std::string entregas;
-    // int carga_max = capacity; // Carga Maxima padrao = 180
-    // int num_deliveries = pesos.size();
-    // int peso_atual = pesos[_chrom[0]];
-    // int peso_total = 0;
-    // double distancia_veiculo = 0.0;
-    // double total_distancia_veiculos = 0.0;
-// 
-    // int i = 0;
-    // int j = 1;
-    // int veiculo = 1;
-    // distancia_veiculo = (*matrix)[num_deliveries][_chrom[i]];
-    // int sum_of_elems = std::accumulate(pesos.begin(), pesos.end(), 0);
-    // 
-    // // std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/customers.txt", std::ios::out | std::ios::app);
-// 
-// 
-    // while (j < num_deliveries) //&& veiculo <= minimum_vehicles
-    // {
-        // if ((peso_atual + pesos[_chrom[j]] > carga_max))
-        // {
-            // peso_total += peso_atual;
-            // total_distancia_veiculos += distancia_veiculo + (*matrix)[num_deliveries][_chrom[i]]; // last customer to origin point
-// 
-            // // reset variables
-            // peso_atual = pesos[_chrom[j]];
-            // distancia_veiculo = (*matrix)[num_deliveries][_chrom[j]];
-            // veiculo++;
-        // }
-        // else
-        // {
-            // // if (veiculo > minimum_vehicles){
-            // //     throw std::runtime_error("Número de Veículos ultrapassou o valor ótimo!");
-            // // }
-            // peso_atual += pesos[_chrom[j]];
-            // distancia_veiculo += (*matrix)[_chrom[i]][_chrom[j]];
-        // }
-        // i++;
-        // j++;
-    // }
-    // 
-    // if (peso_total != sum_of_elems)
-    // {
-        // peso_total += peso_atual;
-        // total_distancia_veiculos += distancia_veiculo +  (*matrix)[num_deliveries][_chrom[i]];
-    // }
-// 
-    // // if (veiculo < minimum_vehicles){
-    // //     throw std::runtime_error("Menos Veiculos que o valor ótimo!");
-    // // }
-// 
-    // return total_distancia_veiculos;
-// }
-// 
-
-
 double real_value(const Chrom &_chrom)
 {
-
     std::string entregas;
-    int carga_max = 180;
+    int carga_max = capacity; // Carga Maxima padrao = 180
+    int num_deliveries = pesos.size();
+    int peso_atual = pesos[_chrom[0]];
+    int peso_total = 0;
+    double distancia_veiculo = 0.0;
+    double total_distancia_veiculos = 0.0;
 
     int i = 0;
-    int peso_atual;
-    int pop_size = pesos.size();
-	double soma_distancia = 0.0;
+    int j = 1;
+    int veiculo = 1;
+    distancia_veiculo = (*matrix)[num_deliveries][_chrom[i]];
+    int sum_of_elems = std::accumulate(pesos.begin(), pesos.end(), 0);
+    
+    // std::ofstream out("/home/eiki/cvrp/eo/tutorial/Lesson1/customers.txt", std::ios::out | std::ios::app);
 
-    while (i < pop_size)
+
+    while (j < num_deliveries) //&& veiculo <= minimum_vehicles
     {
-        // VARIAVEIS PARA REQUISIÇÃO
-        CURL *curl;
-        CURLcode res;
-        std::string readBuffer;
-        std::string url;
-
-        std::stringstream coordinate;
-        std::stringstream requisicao;
-
-        peso_atual = 0;
-
-        // * Hub coordinate
-        coordinate << origin.first << "," << origin.second << ";";
-        while (true)
+        if ((peso_atual + pesos[_chrom[j]] > carga_max))
         {
-            if ((i == pop_size) || (peso_atual + pesos[_chrom[i]] > carga_max))
-                break;
+            peso_total += peso_atual;
+            total_distancia_veiculos += distancia_veiculo + (*matrix)[num_deliveries][_chrom[i]]; // last customer to origin point
 
-            peso_atual += pesos[_chrom[i]];
-            coordinate << coordenadas[_chrom[i]].first << "," << coordenadas[_chrom[i]].second << ";";
-            i++;
+            // reset variables
+            peso_atual = pesos[_chrom[j]];
+            distancia_veiculo = (*matrix)[num_deliveries][_chrom[j]];
+            veiculo++;
         }
-        // Return back to hub
-        coordinate << origin.first << "," << origin.second;\
-
-        // ==========================================================
-        // REQUISITAR CALCULO DE DISTANCIA NO SERVIDOR LOCAL DO OSRM
-        // ==========================================================
-        curl = curl_easy_init();
-       	entregas = coordinate.str();
-        requisicao << "http://localhost:5000/route/v1/driving/" + entregas + "?annotations=distance&continue_straight=false";
-        url = requisicao.str();
-
-        if (curl)
+        else
         {
-
-            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-
-            res = curl_easy_perform(curl);
-
-            if (res == CURLE_OK)
-            {
-                // SOMAR AS DISTANCIAS DE CADA VEICULO
-                nlohmann::json jsonObject = nlohmann::json::parse(readBuffer);
-                // ! DOUBLE CHECK
-                soma_distancia += jsonObject["routes"][0]["distance"].get<double>();
-            }
-            else
-            {
-                std::cerr << "Erro ao realizar a solicitação HTTP: " << curl_easy_strerror(res) << std::endl;
-            }
-  	        curl_easy_cleanup(curl);
+            // if (veiculo > minimum_vehicles){
+            //     throw std::runtime_error("Número de Veículos ultrapassou o valor ótimo!");
+            // }
+            peso_atual += pesos[_chrom[j]];
+            distancia_veiculo += (*matrix)[_chrom[i]][_chrom[j]];
         }
+        i++;
+        j++;
     }
-    return soma_distancia;
+    
+    if (peso_total != sum_of_elems)
+    {
+        peso_total += peso_atual;
+        total_distancia_veiculos += distancia_veiculo +  (*matrix)[num_deliveries][_chrom[i]];
+    }
+
+    // if (veiculo < minimum_vehicles){
+    //     throw std::runtime_error("Menos Veiculos que o valor ótimo!");
+    // }
+
+    return total_distancia_veiculos;
 }
 
 
@@ -260,20 +231,6 @@ void main_function(int argc, std::string instance_name)
      * argv[1]: json file name
      */
     std::cout << fixed;
-
-    // std::string instance_name = argv[1];
-
-    // std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Vrp-Set-A/A/" + instance_name;
-    // std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/Uchoa/" + instance_name;
-
-
-
-// 
-    // std::string fullPath = "/home/eiki/cvrp/eo/tutorial/Lesson1/dataset/" + instance_name;
-// 
-    // std::ifstream f(fullPath);
-    // auto jsonDados = nlohmann::json::parse(f);
-
 
 	file >> jsonDados;
 
