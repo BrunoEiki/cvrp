@@ -67,6 +67,8 @@ double lng, lat;
 
 typedef eoInt<double> Chrom;
 
+std::ofstream out("/home/eiki/github/cvrp/eo/tutorial/Lesson1/aaaaaa.txt", std::ios::out | std::ios::app);
+
 
 double euclidian_distance(double x1_point, double y1_point, double x2_point, double y2_point)
 {
@@ -121,8 +123,8 @@ void create_distance_matrix(std::vector<std::vector<double>> &matrix, int indivi
 {
     double dist;
     const size_t numDeliveries = individual_size;
-    // std::vector<std::vector<double>> *matrix = new std::vector<std::vector<double>>(numDeliveries + 1.0, std::vector<double>(numDeliveries + 1.0, 0.0));
 
+    // std::vector<std::vector<double>> *matrix = new std::vector<std::vector<double>>(numDeliveries + 1.0, std::vector<double>(numDeliveries + 1.0, 0.0));
     
     for (size_t i = 0; i < numDeliveries; i++)
     {
@@ -132,23 +134,23 @@ void create_distance_matrix(std::vector<std::vector<double>> &matrix, int indivi
         // entrega (ou entrega 0) está na extremidade da matriz. Se
         // existem 5 entregas, a matriz terá tamanho 6 e tal distância
         // vai estar em [i][5]
-        dist = euclidian_distance(origin.first, origin.second, coordenadas[i].first, coordenadas[i].second);
-        matrix[numDeliveries][i] = originDist;
-        matrix[i][numDeliveries] = originDist;
+
+
+        dist = osrm_distance_request(origin.first, origin.second, coordenadas[i].first, coordenadas[i].second);
+        matrix[numDeliveries][i] = dist;
+        matrix[i][numDeliveries] = dist;
 
         for (size_t j = 0; j < numDeliveries; j++)
         {
             if (i != j)
             {
-                dist = osrm_distance_request(coordenadas[_chrom[i]].first, coordenadas[_chrom[i]].second,
-                                            coordenadas[_chrom[j]].first, coordenadas[_chrom[j]].second);
+                dist = osrm_distance_request(coordenadas[i].first, coordenadas[i].second,
+                                            coordenadas[j].first, coordenadas[j].second);
                 matrix[i][j] = dist;
                 matrix[j][i] = dist;
             }
         }
     }
-
-
 };
 
 void gerarVetorAleatorio(Chrom &_chrom, int n)
@@ -225,12 +227,20 @@ double real_value(const Chrom &_chrom)
 }
 
 
-void main_function(int argc, std::string instance_name)
+// void main_function(int argc, std::string instance_name)
+void main_function(int argc)
 {
     /*
      * argv[1]: json file name
      */
     std::cout << fixed;
+    if (!out)
+    {
+        std::cerr << "Erro ao abrir o arquivo.\n";
+    } else {
+        out << "AAAAAAAAAAAA";
+        out.flush();
+    }
 
 	file >> jsonDados;
 
@@ -240,7 +250,7 @@ void main_function(int argc, std::string instance_name)
     origin = {lng, lat};
 
 // 
-    // capacity = jsonDados["capacity"];
+    capacity = jsonDados["vehicle_capacity"];
     int dimension = jsonDados["dimension"];
     // minimum_vehicles = jsonDados["minimum_vehicles"];
     origin = {jsonDados["origin"]["x"], jsonDados["origin"]["y"]};
@@ -303,12 +313,12 @@ void main_function(int argc, std::string instance_name)
     // o ver será substituido aqui pelo bash.
     // CROSSOVER
     
-    eoGreedyXover<Chrom> xover(*matrix);
+    // eoGreedyXover<Chrom> xover(*matrix);
 	// eoPartiallyMappedXover<Chrom> xover;   //converge mt rapido
     // eoCycleXover<Chrom> xover; // converge mto rapido
     // eoOrderXover<Chrom> xover;
     // eoPrecedencePreserveXover<Chrom> xover;  //converge mto rapido
-    // eoGreedyOrderXover<Chrom> xover(*matrix, pesos, 10);
+    eoGreedyOrderXover<Chrom> xover(*matrix, pesos, 10);
     
     // eoLinearOrderXover<Chrom> xover; // errado
     // eoOrderXover2<Chrom> xover; //converge mto rapido
@@ -334,6 +344,8 @@ void main_function(int argc, std::string instance_name)
     // cout << "\n===========================";
     // cout << "\nDistTot  Tam   Indices";
     // cout << "\n=========================== pop: " << pop;
+    
+    out.close();
 }
 
 int main(int argc, char **argv)
@@ -341,8 +353,10 @@ int main(int argc, char **argv)
     try
     {
         if (argc >= 2){
-            std::string instance_name = argv[1];
-            main_function(argc, instance_name);
+            // std::string instance_name = argv[1];
+            // main_function(argc, instance_name);
+            main_function(argc);
+
         }
 
     }
