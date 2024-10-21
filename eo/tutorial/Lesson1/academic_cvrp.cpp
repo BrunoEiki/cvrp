@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <numeric>
 #include <limits.h>
+#include <filesystem>
+
 
 #include <nlohmann/json.hpp>
 #include <curl/curl.h>
@@ -35,14 +37,18 @@
 
 using namespace std;
 
-std::ifstream file("./cvrp-2-rj-17.json");
-nlohmann::json jsonDados;
+
 
 static size_t WriteCallback(char *contents, size_t size, size_t nmemb, char *buffer_in)
 {
     ((std::string *)buffer_in)->append((char *)contents, size * nmemb);
     return size * nmemb;
 }
+
+std::string fullPath = "/home/eiki/github/cvrp/eo/tutorial/Lesson1/cvrp-2-rj-17.json";
+std::ifstream file(fullPath);
+nlohmann::json jsonDados;
+
 
 // VARIAVEIS GLOBAIS
 std::pair<double, double> origin;                   // ponto de partida
@@ -54,7 +60,7 @@ int infinity = std::numeric_limits<int>::max();
 
 std::vector<std::vector<double>> *matrix; // matriz com distâncias euclidianas
 
-std::string readBuffer;
+
 
 double lng, lat;
 
@@ -92,7 +98,7 @@ double osrm_distance_request(double ix, double iy, double jx, double jy) {
     if (curl)
     {
         coordinate << ix << "," << iy << ";";
-        coordinate << jx << "," << jy << ";";
+        coordinate << jx << "," << jy;
 
         entregas = coordinate.str();
         requisicao << "http://localhost:5000/route/v1/driving/" + entregas + "?annotations=distance&continue_straight=false";
@@ -109,6 +115,7 @@ double osrm_distance_request(double ix, double iy, double jx, double jy) {
             // SOMAR AS DISTANCIAS DE CADA VEICULO
             nlohmann::json jsonObject = nlohmann::json::parse(readBuffer);
             dist = jsonObject["routes"][0]["distance"].get<double>();
+            out.flush();
         }
         else
         {
@@ -125,7 +132,11 @@ void create_distance_matrix(std::vector<std::vector<double>> &matrix, int indivi
     const size_t numDeliveries = individual_size;
 
     // std::vector<std::vector<double>> *matrix = new std::vector<std::vector<double>>(numDeliveries + 1.0, std::vector<double>(numDeliveries + 1.0, 0.0));
-    
+    if (!out)
+    {
+      std::cerr << "Erro ao abrir o arquivo.\n";
+    }
+    else {
     for (size_t i = 0; i < numDeliveries; i++)
     {
         // 1. Não existe distância entre entrega de índice igual
@@ -135,7 +146,8 @@ void create_distance_matrix(std::vector<std::vector<double>> &matrix, int indivi
         // existem 5 entregas, a matriz terá tamanho 6 e tal distância
         // vai estar em [i][5]
 
-
+        out << "request" << "\n";
+        out.flush();
         dist = osrm_distance_request(origin.first, origin.second, coordenadas[i].first, coordenadas[i].second);
         matrix[numDeliveries][i] = dist;
         matrix[i][numDeliveries] = dist;
@@ -151,6 +163,8 @@ void create_distance_matrix(std::vector<std::vector<double>> &matrix, int indivi
             }
         }
     }
+    }
+    out.close();
 };
 
 void gerarVetorAleatorio(Chrom &_chrom, int n)
@@ -234,13 +248,11 @@ void main_function(int argc)
      * argv[1]: json file name
      */
     std::cout << fixed;
-    if (!out)
-    {
-        std::cerr << "Erro ao abrir o arquivo.\n";
-    } else {
-        out << "AAAAAAAAAAAA";
-        out.flush();
-    }
+    // if (!out)
+    // {
+    //     std::cerr << "Erro ao abrir o arquivo.\n";
+    // } else {
+    
 
 	file >> jsonDados;
 
@@ -249,18 +261,19 @@ void main_function(int argc)
     lat = jsonDados["origin"]["lat"].get<double>();
     origin = {lng, lat};
 
-// 
+    std::cout << lng;
+
     capacity = jsonDados["vehicle_capacity"];
     int dimension = jsonDados["dimension"];
     // minimum_vehicles = jsonDados["minimum_vehicles"];
-    origin = {jsonDados["origin"]["x"], jsonDados["origin"]["y"]};
+    // origin = {jsonDados["origin"]["x"], jsonDados["origin"]["y"]};
 
     if (jsonDados["deliveries"].is_array())
     {
         for (const auto &entrega : jsonDados["deliveries"])
         {
-            lng = entrega["point"]["x"].get<double>();
-            lat = entrega["point"]["y"].get<double>();
+            lng = entrega["point"]["lng"].get<double>();
+            lat = entrega["point"]["lat"].get<double>();
             coordenadas.emplace_back(lng, lat);
 
             pesos.emplace_back(entrega["size"]);
@@ -281,6 +294,9 @@ void main_function(int argc)
     rng.reseed(SEED);
     matrix = new std::vector<std::vector<double>>(IND_SIZE + 1, std::vector<double>(IND_SIZE + 1, 0.0));
     create_distance_matrix(*matrix, IND_SIZE);
+
+    out << "checkpoint 3";
+    out.flush();
 
     // EVAL
     /////////////////////////////
@@ -344,19 +360,17 @@ void main_function(int argc)
     // cout << "\n===========================";
     // cout << "\nDistTot  Tam   Indices";
     // cout << "\n=========================== pop: " << pop;
-    
-    out.close();
+
 }
 
 int main(int argc, char **argv)
 {
     try
     {
-        if (argc >= 2){
+        if (argc >= 1){
             // std::string instance_name = argv[1];
             // main_function(argc, instance_name);
             main_function(argc);
-
         }
 
     }
